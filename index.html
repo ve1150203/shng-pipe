@@ -24,14 +24,11 @@
     <div class="no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <span class="bg-blue-600 text-white px-3 py-1 rounded-lg font-bold text-sm">圖資專用</span>
-        <h1 class="text-lg font-bold text-slate-800">管線敷設統計與 Excel 匯出系統</h1>
+        <h1 class="text-lg font-bold text-slate-800">管線敷設統計與歷史紀錄系統</h1>
       </div>
       <div class="flex flex-wrap items-center gap-2">
-        <button onclick="exportExcelCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium shadow-sm transition">
-          📥 下載 Excel 表格 (.csv)
-        </button>
         <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-sm font-medium">🖨️ 列印公開報表</button>
-        <button onclick="exportJSON()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium">💾 備份 JSON</button>
+        <button onclick="exportJSON()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium">💾 備份 JSON (防止遺失)</button>
         <label class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer">
           📂 還原備份 <input type="file" id="importFile" accept=".json" class="hidden" onchange="importJSON(event)" />
         </label>
@@ -126,11 +123,11 @@
           </div>
           <div class="bg-white p-2 rounded border">
             <div class="text-xs text-slate-500">中壓淨增加</div>
-            <div id="sum_mp" class="font-bold text-blue-700">0.00</div>
+            <div id="sum_mp" class="font-bold text-slate-700">0.00</div>
           </div>
           <div class="bg-white p-2 rounded border">
             <div class="text-xs text-slate-500">低壓淨增加</div>
-            <div id="sum_lp" class="font-bold text-blue-700">0.00</div>
+            <div id="sum_lp" class="font-bold text-slate-700">0.00</div>
           </div>
           <div class="bg-white p-2 rounded border">
             <div class="text-xs text-slate-500">合計淨增加</div>
@@ -158,7 +155,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'hsin_hsiung_pipeline_records_v7';
+    const STORAGE_KEY = 'hsin_hsiung_pipeline_records_v6';
     function getRecords() {
       const raw = localStorage.getItem(STORAGE_KEY);
       return raw ? JSON.parse(raw) : [];
@@ -235,7 +232,7 @@
       document.getElementById('inputYear').value = rec.year;
       document.getElementById('inputMonth').value = rec.month;
       document.getElementById('titleYear').innerText = rec.year;
-      document.getElementById('titleMonth').innerText = String(m).padStart(2, '0');
+      document.getElementById('titleMonth').innerText = String(rec.month).padStart(2, '0');
       document.getElementById('hp_prev').value = rec.hp_prev;
       document.getElementById('hp_curr').value = rec.hp_curr;
       document.getElementById('mp_prev').value = rec.mp_prev;
@@ -319,32 +316,6 @@
         `;
         tbody.appendChild(tr);
       });
-    }
-
-    // 一鍵下載 Excel 專用 CSV 檔案
-    function exportExcelCSV() {
-      const records = getRecords();
-      if (records.length === 0) return alert('目前沒有資料可下載！');
-
-      const headers = ['年', '月', '高壓_上月累計', '高壓_本月累計', '高壓_本月敷設', '中壓_上月累計', '中壓_本月累計', '中壓_本月敷設', '低壓_上月累計', '低壓_本月累計', '低壓_本月敷設'];
-      const rows = records.map(r => {
-        const hp_d = (r.hp_curr - r.hp_prev).toFixed(2);
-        const mp_d = (r.mp_curr - r.mp_prev).toFixed(2);
-        const lp_d = (r.lp_curr - r.lp_prev).toFixed(2);
-        return [
-          r.year, r.month,
-          r.hp_prev, r.hp_curr, hp_d,
-          r.mp_prev, r.mp_curr, mp_d,
-          r.lp_prev, r.lp_curr, lp_d
-        ].join(',');
-      });
-
-      const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `欣雄天然氣_管線敷設統計表_${new Date().toISOString().slice(0,10)}.csv`;
-      link.click();
     }
 
     function exportJSON() {
