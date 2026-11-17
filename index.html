@@ -16,120 +16,79 @@
       border: 1px solid #000;
       padding: 10px 14px;
     }
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans p-4 md:p-8">
 
   <div class="max-w-6xl mx-auto space-y-6">
-    
-    <!-- 頂部操作列 -->
     <div class="no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <span class="bg-blue-600 text-white px-3 py-1 rounded-lg font-bold text-sm">圖資專用</span>
         <h1 class="text-lg font-bold text-slate-800">管線敷設統計與雙軌紀錄系統</h1>
       </div>
       <div class="flex flex-wrap items-center gap-2">
-        <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition">
-          🖨️ 列印公開報表
-        </button>
-        <button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition">
-          📊 匯出 CSV (對應試算表)
-        </button>
-        <button onclick="exportJSON()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition">
-          💾 備份 JSON
-        </button>
-        <label class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition">
-          📂 還原備份
-          <input type="file" id="importFile" accept=".json" class="hidden" onchange="importJSON(event)" />
+        <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-sm font-medium">🖨️ 列印公開報表</button>
+        <button onclick="exportJSON()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium">💾 備份 JSON (防止資料遺失)</button>
+        <label class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer">
+          📂 還原備份 <input type="file" id="importFile" accept=".json" class="hidden" onchange="importJSON(event)" />
         </label>
       </div>
     </div>
 
-    <!-- 輸入與報表主區塊 -->
+    <!-- 輸入區塊 -->
     <div class="print-box bg-white p-6 md:p-10 rounded-xl shadow-sm border border-slate-200">
-      
-      <!-- 年月選擇器 -->
       <div class="no-print mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <label class="font-bold text-blue-900">選擇登錄年月：</label>
-          <div class="flex items-center gap-1">
-            <span>民國</span>
-            <input type="number" id="inputYear" value="115" min="100" max="200" onchange="onDateChange()" class="w-20 px-2 py-1 border border-blue-300 rounded text-center font-bold bg-white" />
-            <span>年</span>
-          </div>
-          <div class="flex items-center gap-1">
-            <select id="inputMonth" onchange="onDateChange()" class="px-3 py-1 border border-blue-300 rounded font-bold bg-white">
-              <option value="1">01</option><option value="2">02</option><option value="3">03</option>
-              <option value="4">04</option><option value="5" selected>05</option><option value="6">06</option>
-              <option value="7">07</option><option value="8">08</option><option value="9">09</option>
-              <option value="10">10</option><option value="11">11</option><option value="12">12</option>
-            </select>
-            <span>月</span>
-          </div>
+          <span>民國</span>
+          <input type="number" id="inputYear" value="115" onchange="onDateChange()" class="w-20 px-2 py-1 border rounded text-center font-bold bg-white" />
+          <span>年</span>
+          <select id="inputMonth" onchange="onDateChange()" class="px-3 py-1 border rounded font-bold bg-white">
+            <option value="1">01</option><option value="2">02</option><option value="3">03</option>
+            <option value="4">04</option><option value="5" selected>05</option><option value="6">06</option>
+            <option value="7">07</option><option value="8">08</option><option value="9">09</option>
+            <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+          </select>
+          <span>月</span>
         </div>
-        <div id="autoFillHint" class="text-xs text-blue-700 font-medium">
-          💡 提示：輸入「上月累計」與「本月累計」，系統自動相減算出「本月敷設」。
-        </div>
+        <div id="autoFillHint" class="text-xs text-blue-700 font-medium">💡 輸入「上月累計」與「本月累計」，系統自動計算本月敷設。</div>
       </div>
 
-      <!-- 官方公開報表區塊 -->
+      <!-- 公開報表 -->
       <div class="max-w-3xl mx-auto">
         <h2 class="text-center text-xl md:text-2xl font-bold tracking-wider mb-2" style="font-family: 'DFKai-SB', '標楷體', serif;">
           <span id="titleYear">115</span> 年 <span id="titleMonth">05</span> 月 &nbsp; 欣雄天然氣股份有限公司管線敷設統計表
         </h2>
-        <div class="text-right text-sm mb-2 font-medium" style="font-family: 'DFKai-SB', '標楷體', serif;">
-          單位：公尺
-        </div>
+        <div class="text-right text-sm mb-2 font-medium" style="font-family: 'DFKai-SB', '標楷體', serif;">單位：公尺</div>
 
         <table class="official-table w-full border-collapse text-base" style="font-family: 'Times New Roman', 'DFKai-SB', '標楷體', serif;">
           <thead>
             <tr class="bg-slate-50">
               <th class="w-1/4"></th>
               <th class="w-1/4 text-center font-bold">上月累計長度</th>
-              <th class="w-1/4 text-center font-bold">本月敷設長度<br><span class="no-print text-xs font-normal text-slate-500">(自動相減)</span></th>
+              <th class="w-1/4 text-center font-bold">本月敷設長度</th>
               <th class="w-1/4 text-center font-bold">本月累計長度</th>
             </tr>
           </thead>
           <tbody>
-            <!-- 高壓 (特別凸顯) -->
-            <tr class="bg-blue-50/30">
-              <td class="text-center font-bold text-blue-900">⚡ 高壓管線</td>
-              <td class="text-right">
-                <input type="number" step="0.01" id="pub_hp_prev" oninput="calculateAll()" placeholder="0.00" class="w-full text-right bg-amber-50/60 focus:bg-yellow-100 px-2 py-1 rounded outline-none font-mono" />
-              </td>
-              <td class="text-right font-mono font-bold text-blue-800 bg-blue-100/40" id="pub_hp_diff">0.00</td>
-              <td class="text-right">
-                <input type="number" step="0.01" id="pub_hp_curr" oninput="calculateAll()" placeholder="0.00" class="w-full text-right bg-blue-50/60 focus:bg-blue-100 px-2 py-1 rounded outline-none font-mono font-semibold" />
-              </td>
+            <tr>
+              <td class="text-center font-bold">高壓管線</td>
+              <td><input type="number" step="0.01" id="pub_hp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 outline-none font-mono" /></td>
+              <td class="text-right font-mono font-bold bg-slate-50" id="pub_hp_diff">0.00</td>
+              <td><input type="number" step="0.01" id="pub_hp_curr" oninput="calculateAll()" class="w-full text-right bg-blue-50 px-2 py-1 outline-none font-mono font-semibold" /></td>
             </tr>
-            <!-- 中壓 -->
             <tr>
               <td class="text-center font-bold">中壓管線</td>
-              <td class="text-right">
-                <input type="number" step="0.01" id="pub_mp_prev" oninput="calculateAll()" placeholder="0.00" class="w-full text-right bg-amber-50/60 focus:bg-yellow-100 px-2 py-1 rounded outline-none font-mono" />
-              </td>
-              <td class="text-right font-mono bg-slate-50/70" id="pub_mp_diff">0.00</td>
-              <td class="text-right">
-                <input type="number" step="0.01" id="pub_mp_curr" oninput="calculateAll()" placeholder="0.00" class="w-full text-right bg-blue-50/60 focus:bg-blue-100 px-2 py-1 rounded outline-none font-mono font-semibold" />
-              </td>
+              <td><input type="number" step="0.01" id="pub_mp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 outline-none font-mono" /></td>
+              <td class="text-right font-mono bg-slate-50" id="pub_mp_diff">0.00</td>
+              <td><input type="number" step="0.01" id="pub_mp_curr" oninput="calculateAll()" class="w-full text-right bg-blue-50 px-2 py-1 outline-none font-mono font-semibold" /></td>
             </tr>
-            <!-- 低壓 -->
             <tr>
               <td class="text-center font-bold">低壓管線</td>
-              <td class="text-right">
-                <input type="number" step="0.01" id="pub_lp_prev" oninput="calculateAll()" placeholder="0.00" class="w-full text-right bg-amber-50/60 focus:bg-yellow-100 px-2 py-1 rounded outline-none font-mono" />
-              </td>
-              <td class="text-right font-mono bg-slate-50/70" id="pub_lp_diff">0.00</td>
-              <td class="text-right">
-                <input type="number" step="0.01" id="pub_lp_curr" oninput="calculateAll()" placeholder="0.00" class="w-full text-right bg-blue-50/60 focus:bg-blue-100 px-2 py-1 rounded outline-none font-mono font-semibold" />
-              </td>
+              <td><input type="number" step="0.01" id="pub_lp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 outline-none font-mono" /></td>
+              <td class="text-right font-mono bg-slate-50" id="pub_lp_diff">0.00</td>
+              <td><input type="number" step="0.01" id="pub_lp_curr" oninput="calculateAll()" class="w-full text-right bg-blue-50 px-2 py-1 outline-none font-mono font-semibold" /></td>
             </tr>
-            <!-- 合計 -->
             <tr class="font-bold bg-slate-100">
               <td class="text-center">合計</td>
               <td class="text-right font-mono" id="pub_tot_prev">0.00</td>
@@ -140,352 +99,212 @@
         </table>
       </div>
 
-      <!-- 內部真實長度區塊 -->
+      <!-- 內部真實長度 -->
       <div class="no-print max-w-3xl mx-auto mt-8 pt-6 border-t-2 border-dashed border-slate-300">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span class="bg-rose-600 text-white text-xs px-2 py-0.5 rounded font-bold">內部機密・不公開</span>
-            <h3 class="font-bold text-slate-800">真實管線長度統計（內部圖資參考）</h3>
-          </div>
-          <span class="text-xs text-slate-500">※ 列印公開報表時此區會自動隱藏</span>
-        </div>
-
+        <h3 class="font-bold text-slate-800 mb-3">🔒 內部真實長度統計（不公開）</h3>
         <table class="w-full border-collapse border border-slate-300 text-sm">
           <thead>
             <tr class="bg-rose-50 text-rose-950">
-              <th class="border border-slate-300 p-2 w-1/4">管線類別</th>
-              <th class="border border-slate-300 p-2 w-1/4">真實_上月累計</th>
-              <th class="border border-slate-300 p-2 w-1/4">真實_本月敷設<br><span class="text-xs font-normal">(自動相減)</span></th>
-              <th class="border border-slate-300 p-2 w-1/4">真實_本月累計</th>
+              <th class="border p-2">管線類別</th>
+              <th class="border p-2">真實_上月累計</th>
+              <th class="border p-2">真實_本月敷設</th>
+              <th class="border p-2">真實_本月累計</th>
             </tr>
           </thead>
           <tbody>
-            <!-- 高壓 (內部) -->
-            <tr class="bg-rose-50/30">
-              <td class="border border-slate-300 p-2 text-center font-bold text-rose-950 bg-rose-100/50">⚡ 高壓管線</td>
-              <td class="border border-slate-300 p-1"><input type="number" step="0.01" id="real_hp_prev" oninput="calculateAll()" placeholder="0.00" class="w-full text-right px-2 py-1 bg-amber-50/50 rounded font-mono outline-none" /></td>
-              <td class="border border-slate-300 p-2 text-right font-mono font-bold text-rose-800 bg-rose-100/40" id="real_hp_diff">0.00</td>
-              <td class="border border-slate-300 p-1"><input type="number" step="0.01" id="real_hp_curr" oninput="calculateAll()" placeholder="0.00" class="w-full text-right px-2 py-1 bg-rose-50/50 rounded font-mono font-semibold outline-none" /></td>
-            </tr>
-            <!-- 中壓 (內部) -->
             <tr>
-              <td class="border border-slate-300 p-2 text-center font-bold bg-slate-50">中壓管線</td>
-              <td class="border border-slate-300 p-1"><input type="number" step="0.01" id="real_mp_prev" oninput="calculateAll()" placeholder="0.00" class="w-full text-right px-2 py-1 bg-amber-50/50 rounded font-mono outline-none" /></td>
-              <td class="border border-slate-300 p-2 text-right font-mono bg-slate-50" id="real_mp_diff">0.00</td>
-              <td class="border border-slate-300 p-1"><input type="number" step="0.01" id="real_mp_curr" oninput="calculateAll()" placeholder="0.00" class="w-full text-right px-2 py-1 bg-rose-50/50 rounded font-mono font-semibold outline-none" /></td>
+              <td class="border p-2 text-center font-bold bg-slate-50">高壓管線</td>
+              <td class="border p-1"><input type="number" step="0.01" id="real_hp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 font-mono outline-none" /></td>
+              <td class="border p-2 text-right font-mono bg-slate-50 font-bold text-rose-800" id="real_hp_diff">0.00</td>
+              <td class="border p-1"><input type="number" step="0.01" id="real_hp_curr" oninput="calculateAll()" class="w-full text-right bg-rose-50 px-2 py-1 font-mono font-semibold outline-none" /></td>
             </tr>
-            <!-- 低壓 (內部) -->
             <tr>
-              <td class="border border-slate-300 p-2 text-center font-bold bg-slate-50">低壓管線</td>
-              <td class="border border-slate-300 p-1"><input type="number" step="0.01" id="real_lp_prev" oninput="calculateAll()" placeholder="0.00" class="w-full text-right px-2 py-1 bg-amber-50/50 rounded font-mono outline-none" /></td>
-              <td class="border border-slate-300 p-2 text-right font-mono bg-slate-50" id="real_lp_diff">0.00</td>
-              <td class="border border-slate-300 p-1"><input type="number" step="0.01" id="real_lp_curr" oninput="calculateAll()" placeholder="0.00" class="w-full text-right px-2 py-1 bg-rose-50/50 rounded font-mono font-semibold outline-none" /></td>
+              <td class="border p-2 text-center font-bold bg-slate-50">中壓管線</td>
+              <td class="border p-1"><input type="number" step="0.01" id="real_mp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 font-mono outline-none" /></td>
+              <td class="border p-2 text-right font-mono bg-slate-50" id="real_mp_diff">0.00</td>
+              <td class="border p-1"><input type="number" step="0.01" id="real_mp_curr" oninput="calculateAll()" class="w-full text-right bg-rose-50 px-2 py-1 font-mono font-semibold outline-none" /></td>
             </tr>
-            <!-- 合計 (內部) -->
+            <tr>
+              <td class="border p-2 text-center font-bold bg-slate-50">低壓管線</td>
+              <td class="border p-1"><input type="number" step="0.01" id="real_lp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 font-mono outline-none" /></td>
+              <td class="border p-2 text-right font-mono bg-slate-50" id="real_lp_diff">0.00</td>
+              <td class="border p-1"><input type="number" step="0.01" id="real_lp_curr" oninput="calculateAll()" class="w-full text-right bg-rose-50 px-2 py-1 font-mono font-semibold outline-none" /></td>
+            </tr>
             <tr class="font-bold bg-slate-100">
-              <td class="border border-slate-300 p-2 text-center">真實合計</td>
-              <td class="border border-slate-300 p-2 text-right font-mono" id="real_tot_prev">0.00</td>
-              <td class="border border-slate-300 p-2 text-right font-mono" id="real_tot_diff">0.00</td>
-              <td class="border border-slate-300 p-2 text-right font-mono" id="real_tot_curr">0.00</td>
+              <td class="border p-2 text-center">真實合計</td>
+              <td class="border p-2 text-right font-mono" id="real_tot_prev">0.00</td>
+              <td class="border p-2 text-right font-mono" id="real_tot_diff">0.00</td>
+              <td class="border p-2 text-right font-mono" id="real_tot_curr">0.00</td>
             </tr>
           </tbody>
         </table>
-
-        <!-- 儲存按鈕 -->
-        <div class="mt-6 flex justify-end gap-3">
-          <button onclick="clearForm()" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 text-sm font-medium">
-            清空目前欄位
-          </button>
-          <button onclick="saveRecord()" class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-sm transition flex items-center gap-2">
-            <span>✅ 儲存本月紀錄（永久保存不覆蓋）</span>
-          </button>
+        <div class="mt-4 flex justify-end">
+          <button onclick="saveRecord()" class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-sm">✅ 儲存本月紀錄</button>
         </div>
       </div>
     </div>
 
-    <!-- 年度趨勢與歷史資料庫 -->
-    <div class="no-print bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
-      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
-        <div>
-          <h3 class="text-lg font-bold text-slate-800">📚 歷史紀錄檔案櫃與當年累計長度變化</h3>
-          <p class="text-xs text-slate-500 mt-1">完整記錄高、中、低壓與當年累計變化，絕不覆蓋。</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <label class="text-sm font-bold text-slate-700">篩選檢視年度：</label>
-          <select id="filterYear" onchange="renderHistory()" class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-bold bg-slate-50">
-            <option value="ALL">顯示全部年度</option>
-          </select>
-        </div>
+    <!-- 歷史與當年累計變化區 -->
+    <div class="no-print bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-lg font-bold text-slate-800">📚 歷史紀錄與當年累計長度變化</h3>
+        <select id="filterYear" onchange="renderHistory()" class="border rounded px-3 py-1 font-bold bg-slate-50">
+          <option value="ALL">顯示全部年度</option>
+        </select>
       </div>
 
-      <!-- 當年累計長度變化總覽卡片 -->
-      <div id="yearlySummaryBox" class="hidden bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
-        <div class="flex items-center justify-between mb-3">
-          <h4 class="font-bold text-blue-900" id="yearlySummaryTitle">民國 115 年當年累計長度變化總覽</h4>
-          <span class="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full" id="yearlyMonthRange">統計區間</span>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div class="bg-white p-3 rounded-lg border border-blue-100">
-            <div class="font-bold text-slate-700 mb-2 border-b pb-1">📢 公開申報長度（當年淨增加量）</div>
-            <div class="grid grid-cols-4 gap-2 text-center font-mono">
-              <div class="bg-blue-50/50 p-1 rounded"><span class="block text-xs text-blue-700 font-bold">高壓</span><span id="sum_pub_hp" class="font-bold text-blue-900">0.00</span></div>
-              <div><span class="block text-xs text-slate-400">中壓</span><span id="sum_pub_mp" class="font-bold text-slate-800">0.00</span></div>
-              <div><span class="block text-xs text-slate-400">低壓</span><span id="sum_pub_lp" class="font-bold text-slate-800">0.00</span></div>
-              <div><span class="block text-xs text-slate-600 font-bold">合計</span><span id="sum_pub_tot" class="font-bold text-slate-700">0.00</span></div>
-            </div>
+      <!-- 當年累計變化總覽卡片 -->
+      <div id="yearlySummaryBox" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <h4 class="font-bold text-blue-900 mb-2" id="yearlySummaryTitle">當年累計長度變化總覽</h4>
+        <div class="grid grid-cols-2 gap-4 text-sm font-mono">
+          <div class="bg-white p-3 rounded border">
+            <div class="font-bold text-slate-700 mb-1">📢 申報當年淨增加</div>
+            <div>高壓：<span id="sum_pub_hp" class="font-bold text-blue-700">0.00</span> m</div>
+            <div>中壓：<span id="sum_pub_mp">0.00</span> m | 低壓：<span id="sum_pub_lp">0.00</span> m</div>
           </div>
-          <div class="bg-white p-3 rounded-lg border border-rose-100">
-            <div class="font-bold text-rose-900 mb-2 border-b pb-1">🔒 內部真實長度（當年淨增加量）</div>
-            <div class="grid grid-cols-4 gap-2 text-center font-mono">
-              <div class="bg-rose-50/50 p-1 rounded"><span class="block text-xs text-rose-700 font-bold">高壓</span><span id="sum_real_hp" class="font-bold text-rose-900">0.00</span></div>
-              <div><span class="block text-xs text-slate-400">中壓</span><span id="sum_real_mp" class="font-bold text-slate-800">0.00</span></div>
-              <div><span class="block text-xs text-slate-400">低壓</span><span id="sum_real_lp" class="font-bold text-slate-800">0.00</span></div>
-              <div><span class="block text-xs text-slate-600 font-bold">合計</span><span id="sum_real_tot" class="font-bold text-slate-700">0.00</span></div>
-            </div>
+          <div class="bg-white p-3 rounded border">
+            <div class="font-bold text-rose-900 mb-1">🔒 真實當年淨增加</div>
+            <div>高壓：<span id="sum_real_hp" class="font-bold text-rose-700">0.00</span> m</div>
+            <div>中壓：<span id="sum_real_mp">0.00</span> m | 低壓：<span id="sum_real_lp">0.00</span> m</div>
           </div>
         </div>
       </div>
 
-      <!-- 歷史清單表格 -->
       <div class="overflow-x-auto">
-        <table class="w-full border-collapse text-xs md:text-sm text-left">
+        <table class="w-full border-collapse text-sm">
           <thead>
-            <tr class="bg-slate-100 text-slate-700 border-b-2 border-slate-300">
-              <th class="p-2.5">年月</th>
-              <th class="p-2.5 text-right bg-blue-50/40 text-blue-900 font-bold">申報_高壓累計<br><span class="text-blue-600 font-normal">(本月敷設)</span></th>
+            <tr class="bg-slate-100 border-b">
+              <th class="p-2.5 text-left">年月</th>
+              <th class="p-2.5 text-right">申報_高壓累計(敷設)</th>
               <th class="p-2.5 text-right">申報_中壓累計</th>
               <th class="p-2.5 text-right">申報_低壓累計</th>
-              <th class="p-2.5 text-right bg-rose-50/40 text-rose-900 font-bold">真實_高壓累計<br><span class="text-rose-600 font-normal">(本月敷設)</span></th>
+              <th class="p-2.5 text-right">真實_高壓累計(敷設)</th>
               <th class="p-2.5 text-center">操作</th>
             </tr>
           </thead>
-          <tbody id="historyTableBody" class="divide-y divide-slate-200">
-            <!-- 動態產生 -->
-          </tbody>
+          <tbody id="historyTableBody" class="divide-y"></tbody>
         </table>
       </div>
     </div>
-
   </div>
 
   <script>
-    const STORAGE_KEY = 'hsin_hsiung_pipeline_records_v4';
-
+    const STORAGE_KEY = 'hsin_hsiung_pipeline_records_v5';
     function getRecords() {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) {
-        const initial = [{
-          id: '115-05',
-          year: 115,
-          month: 5,
-          pub: {
-            hp_prev: 154748.40, hp_curr: 154748.40,
-            mp_prev: 1160844.57, mp_curr: 1175376.57,
-            lp_prev: 322886.53, lp_curr: 323319.43
-          },
-          real: {
-            hp_prev: 154748.40, hp_curr: 154748.40,
-            mp_prev: 1160844.57, mp_curr: 1175376.57,
-            lp_prev: 322886.53, lp_curr: 323319.43
-          }
-        }];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
-        return initial;
-      }
-      return JSON.parse(raw);
+      return raw ? JSON.parse(raw) : [];
     }
-
     function saveRecordsToStorage(records) {
       records.sort((a, b) => (a.year - b.year) || (a.month - b.month));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
     }
-
-    function fmt(num) {
-      return Number(num || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    function val(id) {
-      return parseFloat(document.getElementById(id).value) || 0;
-    }
+    function fmt(n) { return Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function val(id) { return parseFloat(document.getElementById(id).value) || 0; }
 
     function calculateAll() {
       const p_hp_prev = val('pub_hp_prev'), p_hp_curr = val('pub_hp_curr');
       const p_mp_prev = val('pub_mp_prev'), p_mp_curr = val('pub_mp_curr');
       const p_lp_prev = val('pub_lp_prev'), p_lp_curr = val('pub_lp_curr');
-
-      const p_hp_diff = p_hp_curr - p_hp_prev;
-      const p_mp_diff = p_mp_curr - p_mp_prev;
-      const p_lp_diff = p_lp_curr - p_lp_prev;
-
-      document.getElementById('pub_hp_diff').innerText = fmt(p_hp_diff);
-      document.getElementById('pub_mp_diff').innerText = fmt(p_mp_diff);
-      document.getElementById('pub_lp_diff').innerText = fmt(p_lp_diff);
-
+      document.getElementById('pub_hp_diff').innerText = fmt(p_hp_curr - p_hp_prev);
+      document.getElementById('pub_mp_diff').innerText = fmt(p_mp_curr - p_mp_prev);
+      document.getElementById('pub_lp_diff').innerText = fmt(p_lp_curr - p_lp_prev);
       document.getElementById('pub_tot_prev').innerText = fmt(p_hp_prev + p_mp_prev + p_lp_prev);
-      document.getElementById('pub_tot_diff').innerText = fmt(p_hp_diff + p_mp_diff + p_lp_diff);
+      document.getElementById('pub_tot_diff').innerText = fmt((p_hp_curr - p_hp_prev) + (p_mp_curr - p_mp_prev) + (p_lp_curr - p_lp_prev));
       document.getElementById('pub_tot_curr').innerText = fmt(p_hp_curr + p_mp_curr + p_lp_curr);
 
       const r_hp_prev = val('real_hp_prev'), r_hp_curr = val('real_hp_curr');
       const r_mp_prev = val('real_mp_prev'), r_mp_curr = val('real_mp_curr');
       const r_lp_prev = val('real_lp_prev'), r_lp_curr = val('real_lp_curr');
-
-      const r_hp_diff = r_hp_curr - r_hp_prev;
-      const r_mp_diff = r_mp_curr - r_mp_prev;
-      const r_lp_diff = r_lp_curr - r_lp_prev;
-
-      document.getElementById('real_hp_diff').innerText = fmt(r_hp_diff);
-      document.getElementById('real_mp_diff').innerText = fmt(r_mp_diff);
-      document.getElementById('real_lp_diff').innerText = fmt(r_lp_diff);
-
+      document.getElementById('real_hp_diff').innerText = fmt(r_hp_curr - r_hp_prev);
+      document.getElementById('real_mp_diff').innerText = fmt(r_mp_curr - r_mp_prev);
+      document.getElementById('real_lp_diff').innerText = fmt(r_lp_curr - r_lp_prev);
       document.getElementById('real_tot_prev').innerText = fmt(r_hp_prev + r_mp_prev + r_lp_prev);
-      document.getElementById('real_tot_diff').innerText = fmt(r_hp_diff + r_mp_diff + r_lp_diff);
+      document.getElementById('real_tot_diff').innerText = fmt((r_hp_curr - r_hp_prev) + (r_mp_curr - r_mp_prev) + (r_lp_curr - r_lp_prev));
       document.getElementById('real_tot_curr').innerText = fmt(r_hp_curr + r_mp_curr + r_lp_curr);
     }
 
     function onDateChange() {
-      const year = parseInt(document.getElementById('inputYear').value) || 115;
-      const month = parseInt(document.getElementById('inputMonth').value) || 1;
-      const monthStr = String(month).padStart(2, '0');
-
-      document.getElementById('titleYear').innerText = year;
-      document.getElementById('titleMonth').innerText = monthStr;
-
+      const y = parseInt(document.getElementById('inputYear').value) || 115;
+      const m = parseInt(document.getElementById('inputMonth').value) || 1;
+      document.getElementById('titleYear').innerText = y;
+      document.getElementById('titleMonth').innerText = String(m).padStart(2, '0');
       const records = getRecords();
-      const currentId = `${year}-${monthStr}`;
-      const existing = records.find(r => r.id === currentId);
-
+      const existing = records.find(r => r.year === y && r.month === m);
       if (existing) {
         loadRecordToForm(existing, false);
-        document.getElementById('autoFillHint').innerText = `📌 已載入 ${year}年${monthStr}月 存檔。`;
         return;
       }
-
-      let prevYear = year;
-      let prevMonth = month - 1;
-      if (prevMonth === 0) {
-        prevYear = year - 1;
-        prevMonth = 12;
-      }
-      const prevId = `${prevYear}-${String(prevMonth).padStart(2, '0')}`;
-      const prevRecord = records.find(r => r.id === prevId);
-
-      if (prevRecord) {
-        document.getElementById('pub_hp_prev').value = prevRecord.pub.hp_curr;
-        document.getElementById('pub_mp_prev').value = prevRecord.pub.mp_curr;
-        document.getElementById('pub_lp_prev').value = prevRecord.pub.lp_curr;
-        document.getElementById('pub_hp_curr').value = '';
-        document.getElementById('pub_mp_curr').value = '';
-        document.getElementById('pub_lp_curr').value = '';
-
-        document.getElementById('real_hp_prev').value = prevRecord.real.hp_curr;
-        document.getElementById('real_mp_prev').value = prevRecord.real.mp_curr;
-        document.getElementById('real_lp_prev').value = prevRecord.real.lp_curr;
-        document.getElementById('real_hp_curr').value = '';
-        document.getElementById('real_mp_curr').value = '';
-        document.getElementById('real_lp_curr').value = '';
-
-        document.getElementById('autoFillHint').innerText = `✨ 已自動帶入 ${prevYear}年${String(prevMonth).padStart(2, '0')}月 的本月累計作為「上月累計」！`;
-      } else {
-        document.getElementById('autoFillHint').innerText = `💡 尚無前一個月紀錄，請手動輸入。`;
+      // 自動帶入上月累計
+      let py = y, pm = m - 1;
+      if (pm === 0) { py = y - 1; pm = 12; }
+      const prev = records.find(r => r.year === py && r.month === pm);
+      if (prev) {
+        document.getElementById('pub_hp_prev').value = prev.pub.hp_curr;
+        document.getElementById('pub_mp_prev').value = prev.pub.mp_curr;
+        document.getElementById('pub_lp_prev').value = prev.pub.lp_curr;
+        document.getElementById('real_hp_prev').value = prev.real.hp_curr;
+        document.getElementById('real_mp_prev').value = prev.real.mp_curr;
+        document.getElementById('real_lp_prev').value = prev.real.lp_curr;
       }
       calculateAll();
     }
 
     function saveRecord() {
-      const year = parseInt(document.getElementById('inputYear').value);
-      const month = parseInt(document.getElementById('inputMonth').value);
-      if (!year || !month) return alert('請輸入正確的年份與月份！');
-
-      const monthStr = String(month).padStart(2, '0');
-      const id = `${year}-${monthStr}`;
+      const y = parseInt(document.getElementById('inputYear').value);
+      const m = parseInt(document.getElementById('inputMonth').value);
       const records = getRecords();
-      const idx = records.findIndex(r => r.id === id);
-
-      if (idx !== -1) {
-        if (!confirm(`⚠️ 【${year} 年 ${monthStr} 月】已有紀錄，確定要更新嗎？`)) return;
-      }
-
-      const newRecord = {
-        id,
-        year,
-        month,
-        pub: {
-          hp_prev: val('pub_hp_prev'), hp_curr: val('pub_hp_curr'),
-          mp_prev: val('pub_mp_prev'), mp_curr: val('pub_mp_curr'),
-          lp_prev: val('pub_lp_prev'), lp_curr: val('pub_lp_curr')
-        },
-        real: {
-          hp_prev: val('real_hp_prev'), hp_curr: val('real_hp_curr'),
-          mp_prev: val('real_mp_prev'), mp_curr: val('real_mp_curr'),
-          lp_prev: val('real_lp_prev'), lp_curr: val('real_lp_curr')
-        }
+      const idx = records.findIndex(r => r.year === y && r.month === m);
+      const rec = {
+        year: y, month: m,
+        pub: { hp_prev: val('pub_hp_prev'), hp_curr: val('pub_hp_curr'), mp_prev: val('pub_mp_prev'), mp_curr: val('pub_mp_curr'), lp_prev: val('pub_lp_prev'), lp_curr: val('pub_lp_curr') },
+        real: { hp_prev: val('real_hp_prev'), hp_curr: val('real_hp_curr'), mp_prev: val('real_mp_prev'), mp_curr: val('real_mp_curr'), lp_prev: val('real_lp_prev'), lp_curr: val('real_lp_curr') }
       };
-
-      if (idx !== -1) records[idx] = newRecord;
-      else records.push(newRecord);
-
+      if (idx !== -1) records[idx] = rec; else records.push(rec);
       saveRecordsToStorage(records);
-      updateYearFilterOptions(year);
+      updateYearFilterOptions(y);
       renderHistory();
-      alert(`✅ 成功儲存【${year} 年 ${monthStr} 月】紀錄！`);
+      alert(`✅ 民國 ${y} 年 ${m} 月紀錄儲存成功！`);
     }
 
-    function loadRecordToForm(rec, scroll = true) {
+    function loadRecordToForm(rec) {
       document.getElementById('inputYear').value = rec.year;
       document.getElementById('inputMonth').value = rec.month;
       document.getElementById('titleYear').innerText = rec.year;
       document.getElementById('titleMonth').innerText = String(rec.month).padStart(2, '0');
-
       document.getElementById('pub_hp_prev').value = rec.pub.hp_prev;
       document.getElementById('pub_hp_curr').value = rec.pub.hp_curr;
       document.getElementById('pub_mp_prev').value = rec.pub.mp_prev;
       document.getElementById('pub_mp_curr').value = rec.pub.mp_curr;
       document.getElementById('pub_lp_prev').value = rec.pub.lp_prev;
       document.getElementById('pub_lp_curr').value = rec.pub.lp_curr;
-
       document.getElementById('real_hp_prev').value = rec.real.hp_prev;
       document.getElementById('real_hp_curr').value = rec.real.hp_curr;
       document.getElementById('real_mp_prev').value = rec.real.mp_prev;
       document.getElementById('real_mp_curr').value = rec.real.mp_curr;
       document.getElementById('real_lp_prev').value = rec.real.lp_prev;
       document.getElementById('real_lp_curr').value = rec.real.lp_curr;
-
       calculateAll();
-      if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function deleteRecord(id) {
-      if (!confirm(`確定要刪除【${id}】這筆紀錄嗎？`)) return;
-      let records = getRecords();
-      records = records.filter(r => r.id !== id);
-      saveRecordsToStorage(records);
+    function deleteRecord(y, m) {
+      if (!confirm(`確定刪除民國 ${y} 年 ${m} 月嗎？`)) return;
+      saveRecordsToStorage(getRecords().filter(r => !(r.year === y && r.month === m)));
       updateYearFilterOptions();
       renderHistory();
     }
 
-    function clearForm() {
-      ['pub_hp_prev','pub_hp_curr','pub_mp_prev','pub_mp_curr','pub_lp_prev','pub_lp_curr',
-       'real_hp_prev','real_hp_curr','real_mp_prev','real_mp_curr','real_lp_prev','real_lp_curr']
-      .forEach(id => document.getElementById(id).value = '');
-      calculateAll();
-    }
-
-    function updateYearFilterOptions(selectYear = null) {
+    function updateYearFilterOptions(selY) {
       const records = getRecords();
       const years = [...new Set(records.map(r => r.year))].sort((a, b) => b - a);
       const select = document.getElementById('filterYear');
-      const currentVal = selectYear || select.value;
-
+      const cur = selY || select.value;
       select.innerHTML = '<option value="ALL">顯示全部年度</option>';
       years.forEach(y => {
         const opt = document.createElement('option');
-        opt.value = y;
-        opt.innerText = `民國 ${y} 年`;
+        opt.value = y; opt.innerText = `民國 ${y} 年`;
         select.appendChild(opt);
       });
-
-      if (years.includes(Number(currentVal))) select.value = currentVal;
-      else if (years.length > 0 && !selectYear) select.value = years[0];
+      if (years.includes(Number(cur))) select.value = cur;
     }
 
     function renderHistory() {
@@ -493,120 +312,75 @@
       const filterYear = document.getElementById('filterYear').value;
       const tbody = document.getElementById('historyTableBody');
       tbody.innerHTML = '';
-
-      const filtered = filterYear === 'ALL' 
-        ? records 
-        : records.filter(r => r.year === Number(filterYear));
+      const filtered = filterYear === 'ALL' ? records : records.filter(r => r.year === Number(filterYear));
 
       const summaryBox = document.getElementById('yearlySummaryBox');
       if (filterYear !== 'ALL' && filtered.length > 0) {
         summaryBox.classList.remove('hidden');
-        const first = filtered[0];
-        const last = filtered[filtered.length - 1];
+        const first = filtered[0], last = filtered[filtered.length - 1];
         document.getElementById('yearlySummaryTitle').innerText = `📅 民國 ${filterYear} 年（${first.month}月 ～ ${last.month}月）當年累計長度變化`;
-        document.getElementById('yearlyMonthRange').innerText = `共 ${filtered.length} 個月`;
+        
+        const dp_hp = last.pub.hp_curr - first.pub.hp_prev;
+        const dp_mp = last.pub.mp_curr - first.pub.mp_prev;
+        const dp_lp = last.pub.lp_curr - first.pub.lp_prev;
+        document.getElementById('sum_pub_hp').innerText = (dp_hp >= 0 ? '+' : '') + fmt(dp_hp);
+        document.getElementById('sum_pub_mp').innerText = (dp_mp >= 0 ? '+' : '') + fmt(dp_mp);
+        document.getElementById('sum_pub_lp').innerText = (dp_lp >= 0 ? '+' : '') + fmt(dp_lp);
 
-        // 申報當年淨增加
-        const d_p_hp = last.pub.hp_curr - first.pub.hp_prev;
-        const d_p_mp = last.pub.mp_curr - first.pub.mp_prev;
-        const d_p_lp = last.pub.lp_curr - first.pub.lp_prev;
-        document.getElementById('sum_pub_hp').innerText = (d_p_hp >= 0 ? '+' : '') + fmt(d_p_hp);
-        document.getElementById('sum_pub_mp').innerText = (d_p_mp >= 0 ? '+' : '') + fmt(d_p_mp);
-        document.getElementById('sum_pub_lp').innerText = (d_p_lp >= 0 ? '+' : '') + fmt(d_p_lp);
-        document.getElementById('sum_pub_tot').innerText = (d_p_hp + d_p_mp + d_p_lp >= 0 ? '+' : '') + fmt(d_p_hp + d_p_mp + d_p_lp);
-
-        // 真實當年淨增加
-        const d_r_hp = last.real.hp_curr - first.real.hp_prev;
-        const d_r_mp = last.real.mp_curr - first.real.mp_prev;
-        const d_r_lp = last.real.lp_curr - first.real.lp_prev;
-        document.getElementById('sum_real_hp').innerText = (d_r_hp >= 0 ? '+' : '') + fmt(d_r_hp);
-        document.getElementById('sum_real_mp').innerText = (d_r_mp >= 0 ? '+' : '') + fmt(d_r_mp);
-        document.getElementById('sum_real_lp').innerText = (d_r_lp >= 0 ? '+' : '') + fmt(d_r_lp);
-        document.getElementById('sum_real_tot').innerText = (d_r_hp + d_r_mp + d_r_lp >= 0 ? '+' : '') + fmt(d_r_hp + d_r_mp + d_r_lp);
+        const dr_hp = last.real.hp_curr - first.real.hp_prev;
+        const dr_mp = last.real.mp_curr - first.real.mp_prev;
+        const dr_lp = last.real.lp_curr - first.real.lp_prev;
+        document.getElementById('sum_real_hp').innerText = (dr_hp >= 0 ? '+' : '') + fmt(dr_hp);
+        document.getElementById('sum_real_mp').innerText = (dr_mp >= 0 ? '+' : '') + fmt(dr_mp);
+        document.getElementById('sum_real_lp').innerText = (dr_lp >= 0 ? '+' : '') + fmt(dr_lp);
       } else {
         summaryBox.classList.add('hidden');
       }
 
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400">目前尚無紀錄。</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">尚無紀錄。</td></tr>';
         return;
       }
 
-      filtered.forEach(rec => {
-        const p_hp_d = rec.pub.hp_curr - rec.pub.hp_prev;
-        const r_hp_d = rec.real.hp_curr - rec.real.hp_prev;
-
+      filtered.forEach(r => {
+        const p_hp_d = r.pub.hp_curr - r.pub.hp_prev;
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50 transition';
+        tr.className = 'hover:bg-slate-50';
         tr.innerHTML = `
-          <td class="p-2.5 font-bold text-slate-800">${rec.year}年${String(rec.month).padStart(2, '0')}月</td>
-          <td class="p-2.5 text-right font-mono bg-blue-50/20 font-bold text-blue-900">${fmt(rec.pub.hp_curr)}<br><span class="text-xs text-blue-600 font-normal">(${p_hp_d >= 0 ? '+' : ''}${fmt(p_hp_d)})</span></td>
-          <td class="p-2.5 text-right font-mono">${fmt(rec.pub.mp_curr)}</td>
-          <td class="p-2.5 text-right font-mono">${fmt(rec.pub.lp_curr)}</td>
-          <td class="p-2.5 text-right font-mono bg-rose-50/20 font-bold text-rose-900">${fmt(rec.real.hp_curr)}<br><span class="text-xs text-rose-600 font-normal">(${r_hp_d >= 0 ? '+' : ''}${fmt(r_hp_d)})</span></td>
-          <td class="p-2.5 text-center space-x-1">
-            <button onclick='loadRecordToForm(${JSON.stringify(rec)})' class="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded text-xs font-medium">載入/編輯</button>
-            <button onclick="deleteRecord('${rec.id}')" class="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-xs font-medium">刪除</button>
+          <td class="p-2.5 font-bold">${r.year}年${String(r.month).padStart(2,'0')}月</td>
+          <td class="p-2.5 text-right font-mono">${fmt(r.pub.hp_curr)} <span class="text-xs text-blue-600">(${p_hp_d>=0?'+':''}${fmt(p_hp_d)})</span></td>
+          <td class="p-2.5 text-right font-mono">${fmt(r.pub.mp_curr)}</td>
+          <td class="p-2.5 text-right font-mono">${fmt(r.pub.lp_curr)}</td>
+          <td class="p-2.5 text-right font-mono">${fmt(r.real.hp_curr)}</td>
+          <td class="p-2.5 text-center">
+            <button onclick='loadRecordToForm(${JSON.stringify(r)})' class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">載入</button>
+            <button onclick="deleteRecord(${r.year}, ${r.month})" class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">刪除</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    function exportCSV() {
-      const records = getRecords();
-      if (records.length === 0) return alert('無資料可匯出！');
-      const headers = ['年','月','申報_高壓上月','申報_高壓本月敷設','申報_高壓本月累計','真實_高壓上月','真實_高壓本月敷設','真實_高壓本月累計'];
-      const rows = records.map(r => [
-        r.year, r.month,
-        r.pub.hp_prev, (r.pub.hp_curr - r.pub.hp_prev).toFixed(2), r.pub.hp_curr,
-        r.real.hp_prev, (r.real.hp_curr - r.real.hp_prev).toFixed(2), r.real.hp_curr
-      ].join(','));
-
-      const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `欣雄天然氣_高壓管線統計_${new Date().toISOString().slice(0,10)}.csv`;
-      link.click();
-    }
-
     function exportJSON() {
-      const records = getRecords();
-      const blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `欣雄管線備份_${new Date().toISOString().slice(0,10)}.json`;
-      link.click();
+      const blob = new Blob([JSON.stringify(getRecords(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = `欣雄管線備份_${new Date().toISOString().slice(0,10)}.json`; a.click();
     }
 
-    function importJSON(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+    function importJSON(e) {
+      const f = e.target.files[0]; if (!f) return;
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function(evt) {
         try {
-          const imported = JSON.parse(e.target.result);
-          const existing = getRecords();
-          const map = new Map(existing.map(item => [item.id, item]));
-          imported.forEach(item => map.set(item.id, item));
-          saveRecordsToStorage(Array.from(map.values()));
-          updateYearFilterOptions();
-          renderHistory();
-          onDateChange();
-          alert('✅ 匯入成功！');
-        } catch (err) {
-          alert('❌ 檔案格式錯誤');
-        }
+          saveRecordsToStorage(JSON.parse(evt.target.result));
+          updateYearFilterOptions(); renderHistory(); onDateChange();
+          alert('✅ 備份還原成功！');
+        } catch(err) { alert('❌ 格式錯誤'); }
       };
-      reader.readAsText(file);
+      reader.readAsText(f);
     }
 
-    window.onload = function() {
-      updateYearFilterOptions();
-      renderHistory();
-      onDateChange();
-    };
+    window.onload = function() { updateYearFilterOptions(); renderHistory(); onDateChange(); };
   </script>
 </body>
 </html>
