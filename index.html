@@ -24,11 +24,11 @@
     <div class="no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <span class="bg-blue-600 text-white px-3 py-1 rounded-lg font-bold text-sm">圖資專用</span>
-        <h1 class="text-lg font-bold text-slate-800">管線敷設統計與雙軌紀錄系統</h1>
+        <h1 class="text-lg font-bold text-slate-800">管線敷設統計與歷史紀錄系統</h1>
       </div>
       <div class="flex flex-wrap items-center gap-2">
         <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-sm font-medium">🖨️ 列印公開報表</button>
-        <button onclick="exportJSON()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium">💾 備份 JSON (防止資料遺失)</button>
+        <button onclick="exportJSON()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium">💾 備份 JSON (防止遺失)</button>
         <label class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer">
           📂 還原備份 <input type="file" id="importFile" accept=".json" class="hidden" onchange="importJSON(event)" />
         </label>
@@ -51,7 +51,7 @@
           </select>
           <span>月</span>
         </div>
-        <div id="autoFillHint" class="text-xs text-blue-700 font-medium">💡 輸入「上月累計」與「本月累計」，系統自動計算本月敷設。</div>
+        <div id="autoFillHint" class="text-xs text-blue-700 font-medium">💡 輸入「上月累計」與「本月累計」，系統自動計算本月敷設與合計。</div>
       </div>
 
       <!-- 公開報表 -->
@@ -72,74 +72,34 @@
           </thead>
           <tbody>
             <tr>
-              <td class="text-center font-bold">高壓管線</td>
-              <td><input type="number" step="0.01" id="pub_hp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 outline-none font-mono" /></td>
-              <td class="text-right font-mono font-bold bg-slate-50" id="pub_hp_diff">0.00</td>
-              <td><input type="number" step="0.01" id="pub_hp_curr" oninput="calculateAll()" class="w-full text-right bg-blue-50 px-2 py-1 outline-none font-mono font-semibold" /></td>
+              <td class="text-center font-bold">高壓管線 (申報)</td>
+              <td><input type="number" step="0.01" id="hp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 outline-none font-mono" /></td>
+              <td class="text-right font-mono font-bold bg-slate-50" id="hp_diff">0.00</td>
+              <td><input type="number" step="0.01" id="hp_curr" oninput="calculateAll()" class="w-full text-right bg-blue-50 px-2 py-1 outline-none font-mono font-semibold" /></td>
             </tr>
             <tr>
               <td class="text-center font-bold">中壓管線</td>
-              <td><input type="number" step="0.01" id="pub_mp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 outline-none font-mono" /></td>
-              <td class="text-right font-mono bg-slate-50" id="pub_mp_diff">0.00</td>
-              <td><input type="number" step="0.01" id="pub_mp_curr" oninput="calculateAll()" class="w-full text-right bg-blue-50 px-2 py-1 outline-none font-mono font-semibold" /></td>
+              <td><input type="number" step="0.01" id="mp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 outline-none font-mono" /></td>
+              <td class="text-right font-mono bg-slate-50" id="mp_diff">0.00</td>
+              <td><input type="number" step="0.01" id="mp_curr" oninput="calculateAll()" class="w-full text-right bg-blue-50 px-2 py-1 outline-none font-mono font-semibold" /></td>
             </tr>
             <tr>
               <td class="text-center font-bold">低壓管線</td>
-              <td><input type="number" step="0.01" id="pub_lp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 outline-none font-mono" /></td>
-              <td class="text-right font-mono bg-slate-50" id="pub_lp_diff">0.00</td>
-              <td><input type="number" step="0.01" id="pub_lp_curr" oninput="calculateAll()" class="w-full text-right bg-blue-50 px-2 py-1 outline-none font-mono font-semibold" /></td>
+              <td><input type="number" step="0.01" id="lp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 outline-none font-mono" /></td>
+              <td class="text-right font-mono bg-slate-50" id="lp_diff">0.00</td>
+              <td><input type="number" step="0.01" id="lp_curr" oninput="calculateAll()" class="w-full text-right bg-blue-50 px-2 py-1 outline-none font-mono font-semibold" /></td>
             </tr>
             <tr class="font-bold bg-slate-100">
               <td class="text-center">合計</td>
-              <td class="text-right font-mono" id="pub_tot_prev">0.00</td>
-              <td class="text-right font-mono" id="pub_tot_diff">0.00</td>
-              <td class="text-right font-mono" id="pub_tot_curr">0.00</td>
+              <td class="text-right font-mono" id="tot_prev">0.00</td>
+              <td class="text-right font-mono" id="tot_diff">0.00</td>
+              <td class="text-right font-mono" id="tot_curr">0.00</td>
             </tr>
           </tbody>
         </table>
-      </div>
-
-      <!-- 內部真實長度 -->
-      <div class="no-print max-w-3xl mx-auto mt-8 pt-6 border-t-2 border-dashed border-slate-300">
-        <h3 class="font-bold text-slate-800 mb-3">🔒 內部真實長度統計（不公開）</h3>
-        <table class="w-full border-collapse border border-slate-300 text-sm">
-          <thead>
-            <tr class="bg-rose-50 text-rose-950">
-              <th class="border p-2">管線類別</th>
-              <th class="border p-2">真實_上月累計</th>
-              <th class="border p-2">真實_本月敷設</th>
-              <th class="border p-2">真實_本月累計</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="border p-2 text-center font-bold bg-slate-50">高壓管線</td>
-              <td class="border p-1"><input type="number" step="0.01" id="real_hp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 font-mono outline-none" /></td>
-              <td class="border p-2 text-right font-mono bg-slate-50 font-bold text-rose-800" id="real_hp_diff">0.00</td>
-              <td class="border p-1"><input type="number" step="0.01" id="real_hp_curr" oninput="calculateAll()" class="w-full text-right bg-rose-50 px-2 py-1 font-mono font-semibold outline-none" /></td>
-            </tr>
-            <tr>
-              <td class="border p-2 text-center font-bold bg-slate-50">中壓管線</td>
-              <td class="border p-1"><input type="number" step="0.01" id="real_mp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 font-mono outline-none" /></td>
-              <td class="border p-2 text-right font-mono bg-slate-50" id="real_mp_diff">0.00</td>
-              <td class="border p-1"><input type="number" step="0.01" id="real_mp_curr" oninput="calculateAll()" class="w-full text-right bg-rose-50 px-2 py-1 font-mono font-semibold outline-none" /></td>
-            </tr>
-            <tr>
-              <td class="border p-2 text-center font-bold bg-slate-50">低壓管線</td>
-              <td class="border p-1"><input type="number" step="0.01" id="real_lp_prev" oninput="calculateAll()" class="w-full text-right bg-amber-50 px-2 py-1 font-mono outline-none" /></td>
-              <td class="border p-2 text-right font-mono bg-slate-50" id="real_lp_diff">0.00</td>
-              <td class="border p-1"><input type="number" step="0.01" id="real_lp_curr" oninput="calculateAll()" class="w-full text-right bg-rose-50 px-2 py-1 font-mono font-semibold outline-none" /></td>
-            </tr>
-            <tr class="font-bold bg-slate-100">
-              <td class="border p-2 text-center">真實合計</td>
-              <td class="border p-2 text-right font-mono" id="real_tot_prev">0.00</td>
-              <td class="border p-2 text-right font-mono" id="real_tot_diff">0.00</td>
-              <td class="border p-2 text-right font-mono" id="real_tot_curr">0.00</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="mt-4 flex justify-end">
-          <button onclick="saveRecord()" class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-sm">✅ 儲存本月紀錄</button>
+        
+        <div class="mt-6 flex justify-end no-print">
+          <button onclick="saveRecord()" class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-sm">✅ 儲存本月紀錄（永不覆蓋）</button>
         </div>
       </div>
     </div>
@@ -156,16 +116,22 @@
       <!-- 當年累計變化總覽卡片 -->
       <div id="yearlySummaryBox" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-4">
         <h4 class="font-bold text-blue-900 mb-2" id="yearlySummaryTitle">當年累計長度變化總覽</h4>
-        <div class="grid grid-cols-2 gap-4 text-sm font-mono">
-          <div class="bg-white p-3 rounded border">
-            <div class="font-bold text-slate-700 mb-1">📢 申報當年淨增加</div>
-            <div>高壓：<span id="sum_pub_hp" class="font-bold text-blue-700">0.00</span> m</div>
-            <div>中壓：<span id="sum_pub_mp">0.00</span> m | 低壓：<span id="sum_pub_lp">0.00</span> m</div>
+        <div class="grid grid-cols-4 gap-2 text-center text-sm font-mono">
+          <div class="bg-white p-2 rounded border">
+            <div class="text-xs text-slate-500">高壓淨增加</div>
+            <div id="sum_hp" class="font-bold text-blue-700">0.00</div>
           </div>
-          <div class="bg-white p-3 rounded border">
-            <div class="font-bold text-rose-900 mb-1">🔒 真實當年淨增加</div>
-            <div>高壓：<span id="sum_real_hp" class="font-bold text-rose-700">0.00</span> m</div>
-            <div>中壓：<span id="sum_real_mp">0.00</span> m | 低壓：<span id="sum_real_lp">0.00</span> m</div>
+          <div class="bg-white p-2 rounded border">
+            <div class="text-xs text-slate-500">中壓淨增加</div>
+            <div id="sum_mp" class="font-bold text-slate-700">0.00</div>
+          </div>
+          <div class="bg-white p-2 rounded border">
+            <div class="text-xs text-slate-500">低壓淨增加</div>
+            <div id="sum_lp" class="font-bold text-slate-700">0.00</div>
+          </div>
+          <div class="bg-white p-2 rounded border">
+            <div class="text-xs text-slate-500">合計淨增加</div>
+            <div id="sum_tot" class="font-bold text-blue-900">0.00</div>
           </div>
         </div>
       </div>
@@ -174,12 +140,12 @@
         <table class="w-full border-collapse text-sm">
           <thead>
             <tr class="bg-slate-100 border-b">
-              <th class="p-2.5 text-left">年月</th>
-              <th class="p-2.5 text-right">申報_高壓累計(敷設)</th>
-              <th class="p-2.5 text-right">申報_中壓累計</th>
-              <th class="p-2.5 text-right">申報_低壓累計</th>
-              <th class="p-2.5 text-right">真實_高壓累計(敷設)</th>
-              <th class="p-2.5 text-center">操作</th>
+              <th class="p-2 text-left">年月</th>
+              <th class="p-2 text-right">高壓累計(敷設)</th>
+              <th class="p-2 text-right">中壓累計(敷設)</th>
+              <th class="p-2 text-right">低壓累計(敷設)</th>
+              <th class="p-2 text-right font-bold text-blue-700">合計累計(敷設)</th>
+              <th class="p-2 text-center">操作</th>
             </tr>
           </thead>
           <tbody id="historyTableBody" class="divide-y"></tbody>
@@ -189,7 +155,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'hsin_hsiung_pipeline_records_v5';
+    const STORAGE_KEY = 'hsin_hsiung_pipeline_records_v6';
     function getRecords() {
       const raw = localStorage.getItem(STORAGE_KEY);
       return raw ? JSON.parse(raw) : [];
@@ -202,25 +168,21 @@
     function val(id) { return parseFloat(document.getElementById(id).value) || 0; }
 
     function calculateAll() {
-      const p_hp_prev = val('pub_hp_prev'), p_hp_curr = val('pub_hp_curr');
-      const p_mp_prev = val('pub_mp_prev'), p_mp_curr = val('pub_mp_curr');
-      const p_lp_prev = val('pub_lp_prev'), p_lp_curr = val('pub_lp_curr');
-      document.getElementById('pub_hp_diff').innerText = fmt(p_hp_curr - p_hp_prev);
-      document.getElementById('pub_mp_diff').innerText = fmt(p_mp_curr - p_mp_prev);
-      document.getElementById('pub_lp_diff').innerText = fmt(p_lp_curr - p_lp_prev);
-      document.getElementById('pub_tot_prev').innerText = fmt(p_hp_prev + p_mp_prev + p_lp_prev);
-      document.getElementById('pub_tot_diff').innerText = fmt((p_hp_curr - p_hp_prev) + (p_mp_curr - p_mp_prev) + (p_lp_curr - p_lp_prev));
-      document.getElementById('pub_tot_curr').innerText = fmt(p_hp_curr + p_mp_curr + p_lp_curr);
+      const hp_prev = val('hp_prev'), hp_curr = val('hp_curr');
+      const mp_prev = val('mp_prev'), mp_curr = val('mp_curr');
+      const lp_prev = val('lp_prev'), lp_curr = val('lp_curr');
 
-      const r_hp_prev = val('real_hp_prev'), r_hp_curr = val('real_hp_curr');
-      const r_mp_prev = val('real_mp_prev'), r_mp_curr = val('real_mp_curr');
-      const r_lp_prev = val('real_lp_prev'), r_lp_curr = val('real_lp_curr');
-      document.getElementById('real_hp_diff').innerText = fmt(r_hp_curr - r_hp_prev);
-      document.getElementById('real_mp_diff').innerText = fmt(r_mp_curr - r_mp_prev);
-      document.getElementById('real_lp_diff').innerText = fmt(r_lp_curr - r_lp_prev);
-      document.getElementById('real_tot_prev').innerText = fmt(r_hp_prev + r_mp_prev + r_lp_prev);
-      document.getElementById('real_tot_diff').innerText = fmt((r_hp_curr - r_hp_prev) + (r_mp_curr - r_mp_prev) + (r_lp_curr - r_lp_prev));
-      document.getElementById('real_tot_curr').innerText = fmt(r_hp_curr + r_mp_curr + r_lp_curr);
+      const hp_diff = hp_curr - hp_prev;
+      const mp_diff = mp_curr - mp_prev;
+      const lp_diff = lp_curr - lp_prev;
+
+      document.getElementById('hp_diff').innerText = fmt(hp_diff);
+      document.getElementById('mp_diff').innerText = fmt(mp_diff);
+      document.getElementById('lp_diff').innerText = fmt(lp_diff);
+
+      document.getElementById('tot_prev').innerText = fmt(hp_prev + mp_prev + lp_prev);
+      document.getElementById('tot_diff').innerText = fmt(hp_diff + mp_diff + lp_diff);
+      document.getElementById('tot_curr').innerText = fmt(hp_curr + mp_curr + lp_curr);
     }
 
     function onDateChange() {
@@ -234,17 +196,16 @@
         loadRecordToForm(existing, false);
         return;
       }
-      // 自動帶入上月累計
       let py = y, pm = m - 1;
       if (pm === 0) { py = y - 1; pm = 12; }
       const prev = records.find(r => r.year === py && r.month === pm);
       if (prev) {
-        document.getElementById('pub_hp_prev').value = prev.pub.hp_curr;
-        document.getElementById('pub_mp_prev').value = prev.pub.mp_curr;
-        document.getElementById('pub_lp_prev').value = prev.pub.lp_curr;
-        document.getElementById('real_hp_prev').value = prev.real.hp_curr;
-        document.getElementById('real_mp_prev').value = prev.real.mp_curr;
-        document.getElementById('real_lp_prev').value = prev.real.lp_curr;
+        document.getElementById('hp_prev').value = prev.hp_curr;
+        document.getElementById('mp_prev').value = prev.mp_curr;
+        document.getElementById('lp_prev').value = prev.lp_curr;
+        document.getElementById('hp_curr').value = '';
+        document.getElementById('mp_curr').value = '';
+        document.getElementById('lp_curr').value = '';
       }
       calculateAll();
     }
@@ -256,8 +217,9 @@
       const idx = records.findIndex(r => r.year === y && r.month === m);
       const rec = {
         year: y, month: m,
-        pub: { hp_prev: val('pub_hp_prev'), hp_curr: val('pub_hp_curr'), mp_prev: val('pub_mp_prev'), mp_curr: val('pub_mp_curr'), lp_prev: val('pub_lp_prev'), lp_curr: val('pub_lp_curr') },
-        real: { hp_prev: val('real_hp_prev'), hp_curr: val('real_hp_curr'), mp_prev: val('real_mp_prev'), mp_curr: val('real_mp_curr'), lp_prev: val('real_lp_prev'), lp_curr: val('real_lp_curr') }
+        hp_prev: val('hp_prev'), hp_curr: val('hp_curr'),
+        mp_prev: val('mp_prev'), mp_curr: val('mp_curr'),
+        lp_prev: val('lp_prev'), lp_curr: val('lp_curr')
       };
       if (idx !== -1) records[idx] = rec; else records.push(rec);
       saveRecordsToStorage(records);
@@ -271,18 +233,12 @@
       document.getElementById('inputMonth').value = rec.month;
       document.getElementById('titleYear').innerText = rec.year;
       document.getElementById('titleMonth').innerText = String(rec.month).padStart(2, '0');
-      document.getElementById('pub_hp_prev').value = rec.pub.hp_prev;
-      document.getElementById('pub_hp_curr').value = rec.pub.hp_curr;
-      document.getElementById('pub_mp_prev').value = rec.pub.mp_prev;
-      document.getElementById('pub_mp_curr').value = rec.pub.mp_curr;
-      document.getElementById('pub_lp_prev').value = rec.pub.lp_prev;
-      document.getElementById('pub_lp_curr').value = rec.pub.lp_curr;
-      document.getElementById('real_hp_prev').value = rec.real.hp_prev;
-      document.getElementById('real_hp_curr').value = rec.real.hp_curr;
-      document.getElementById('real_mp_prev').value = rec.real.mp_prev;
-      document.getElementById('real_mp_curr').value = rec.real.mp_curr;
-      document.getElementById('real_lp_prev').value = rec.real.lp_prev;
-      document.getElementById('real_lp_curr').value = rec.real.lp_curr;
+      document.getElementById('hp_prev').value = rec.hp_prev;
+      document.getElementById('hp_curr').value = rec.hp_curr;
+      document.getElementById('mp_prev').value = rec.mp_prev;
+      document.getElementById('mp_curr').value = rec.mp_curr;
+      document.getElementById('lp_prev').value = rec.lp_prev;
+      document.getElementById('lp_curr').value = rec.lp_curr;
       calculateAll();
     }
 
@@ -320,19 +276,15 @@
         const first = filtered[0], last = filtered[filtered.length - 1];
         document.getElementById('yearlySummaryTitle').innerText = `📅 民國 ${filterYear} 年（${first.month}月 ～ ${last.month}月）當年累計長度變化`;
         
-        const dp_hp = last.pub.hp_curr - first.pub.hp_prev;
-        const dp_mp = last.pub.mp_curr - first.pub.mp_prev;
-        const dp_lp = last.pub.lp_curr - first.pub.lp_prev;
-        document.getElementById('sum_pub_hp').innerText = (dp_hp >= 0 ? '+' : '') + fmt(dp_hp);
-        document.getElementById('sum_pub_mp').innerText = (dp_mp >= 0 ? '+' : '') + fmt(dp_mp);
-        document.getElementById('sum_pub_lp').innerText = (dp_lp >= 0 ? '+' : '') + fmt(dp_lp);
+        const d_hp = last.hp_curr - first.hp_prev;
+        const d_mp = last.mp_curr - first.mp_prev;
+        const d_lp = last.lp_curr - first.lp_prev;
+        const d_tot = d_hp + d_mp + d_lp;
 
-        const dr_hp = last.real.hp_curr - first.real.hp_prev;
-        const dr_mp = last.real.mp_curr - first.real.mp_prev;
-        const dr_lp = last.real.lp_curr - first.real.lp_prev;
-        document.getElementById('sum_real_hp').innerText = (dr_hp >= 0 ? '+' : '') + fmt(dr_hp);
-        document.getElementById('sum_real_mp').innerText = (dr_mp >= 0 ? '+' : '') + fmt(dr_mp);
-        document.getElementById('sum_real_lp').innerText = (dr_lp >= 0 ? '+' : '') + fmt(dr_lp);
+        document.getElementById('sum_hp').innerText = (d_hp >= 0 ? '+' : '') + fmt(d_hp);
+        document.getElementById('sum_mp').innerText = (d_mp >= 0 ? '+' : '') + fmt(d_mp);
+        document.getElementById('sum_lp').innerText = (d_lp >= 0 ? '+' : '') + fmt(d_lp);
+        document.getElementById('sum_tot').innerText = (d_tot >= 0 ? '+' : '') + fmt(d_tot);
       } else {
         summaryBox.classList.add('hidden');
       }
@@ -343,17 +295,22 @@
       }
 
       filtered.forEach(r => {
-        const p_hp_d = r.pub.hp_curr - r.pub.hp_prev;
+        const hp_d = r.hp_curr - r.hp_prev;
+        const mp_d = r.mp_curr - r.mp_prev;
+        const lp_d = r.lp_curr - r.lp_prev;
+        const tot_curr = r.hp_curr + r.mp_curr + r.lp_curr;
+        const tot_diff = hp_d + mp_d + lp_d;
+
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50';
         tr.innerHTML = `
-          <td class="p-2.5 font-bold">${r.year}年${String(r.month).padStart(2,'0')}月</td>
-          <td class="p-2.5 text-right font-mono">${fmt(r.pub.hp_curr)} <span class="text-xs text-blue-600">(${p_hp_d>=0?'+':''}${fmt(p_hp_d)})</span></td>
-          <td class="p-2.5 text-right font-mono">${fmt(r.pub.mp_curr)}</td>
-          <td class="p-2.5 text-right font-mono">${fmt(r.pub.lp_curr)}</td>
-          <td class="p-2.5 text-right font-mono">${fmt(r.real.hp_curr)}</td>
-          <td class="p-2.5 text-center">
-            <button onclick='loadRecordToForm(${JSON.stringify(r)})' class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">載入</button>
+          <td class="p-2 font-bold">${r.year}年${String(r.month).padStart(2,'0')}月</td>
+          <td class="p-2 text-right font-mono">${fmt(r.hp_curr)} <span class="text-xs text-slate-500">(${hp_d>=0?'+':''}${fmt(hp_d)})</span></td>
+          <td class="p-2 text-right font-mono">${fmt(r.mp_curr)} <span class="text-xs text-slate-500">(${mp_d>=0?'+':''}${fmt(mp_d)})</span></td>
+          <td class="p-2 text-right font-mono">${fmt(r.lp_curr)} <span class="text-xs text-slate-500">(${lp_d>=0?'+':''}${fmt(lp_d)})</span></td>
+          <td class="p-2 text-right font-mono font-bold text-blue-700">${fmt(tot_curr)} <span class="text-xs text-blue-500">(${tot_diff>=0?'+':''}${fmt(tot_diff)})</span></td>
+          <td class="p-2 text-center">
+            <button onclick='loadRecordToForm(${JSON.stringify(r)})' class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs mr-1">載入</button>
             <button onclick="deleteRecord(${r.year}, ${r.month})" class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">刪除</button>
           </td>
         `;
