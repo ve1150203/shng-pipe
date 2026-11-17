@@ -11,6 +11,7 @@
     @media print {
       .no-print { display: none !important; }
       body.hide-real-on-print #realReportSection { display: none !important; }
+      body.hide-real-on-print #yearlySummarySection { display: none !important; }
       body { background: white !important; padding: 0 !important; margin: 0 !important; }
       .print-container { box-shadow: none !important; border: none !important; padding: 0 !important; max-width: 100% !important; }
       input { border: none !important; background: transparent !important; text-align: right; }
@@ -150,7 +151,7 @@
           </div>
           <label class="flex items-center gap-2 cursor-pointer select-none text-sm font-bold text-rose-900">
             <input type="checkbox" id="printRealCheckbox" checked onchange="togglePrintReal()" class="w-4 h-4 accent-rose-600 rounded" />
-            <span>列印時包含此「實際長度」表格</span>
+            <span>列印時包含此「實際長度」表格與當年累計表</span>
           </label>
         </div>
 
@@ -207,8 +208,8 @@
         </button>
       </div>
 
-      <!-- 表三：當年累計新增管線長度（加上 no-print 類別，列印時會自動隱藏） -->
-      <div class="no-print max-w-3xl mx-auto pt-6 border-t border-slate-300 page-break-avoid">
+      <!-- 表三：當年累計新增管線長度（與是否勾選列印實際長度連動） -->
+      <div id="yearlySummarySection" class="max-w-3xl mx-auto pt-6 border-t border-slate-300 page-break-avoid">
         <div class="flex items-center justify-between mb-2">
           <h3 class="font-bold text-slate-800 text-base md:text-lg" style="font-family: 'DFKai-SB', '標楷體', serif;">
             📌 <span class="titleYear">115</span> 年度（<span id="ytdRangeLabel">1月 ～ 11月</span>）當年累計新增管線長度
@@ -234,7 +235,7 @@
               <td class="border border-slate-400 p-2" id="ytd_decl_lp">0.00</td>
               <td class="border border-slate-400 p-2 font-bold text-blue-700" id="ytd_decl_tot">0.00</td>
             </tr>
-            <tr>
+            <tr id="ytdRealRow">
               <td class="border border-slate-400 p-2 text-center font-sans font-bold bg-rose-50/40">實際長度（對內）</td>
               <td class="border border-slate-400 p-2" id="ytd_real_hp">0.00</td>
               <td class="border border-slate-400 p-2" id="ytd_real_mp">0.00</td>
@@ -334,12 +335,15 @@
       return parseFloat(document.getElementById(id).value) || 0;
     }
 
+    // 控制勾選列印實際長度時，是否連動隱藏「實際表格」與「當年累計表」
     function togglePrintReal() {
       const checked = document.getElementById('printRealCheckbox').checked;
       if (checked) {
         document.body.classList.remove('hide-real-on-print');
+        document.getElementById('ytdRealRow').classList.remove('no-print');
       } else {
         document.body.classList.add('hide-real-on-print');
+        document.getElementById('ytdRealRow').classList.add('no-print');
       }
     }
 
