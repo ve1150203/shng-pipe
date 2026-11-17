@@ -53,7 +53,7 @@
     <!-- 輸入與報表主區塊 -->
     <div class="print-box bg-white p-6 md:p-10 rounded-xl shadow-sm border border-slate-200">
       
-      <!-- 年月選擇器 (非列印區提示) -->
+      <!-- 年月選擇器 -->
       <div class="no-print mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <label class="font-bold text-blue-900">選擇登錄年月：</label>
@@ -73,7 +73,7 @@
           </div>
         </div>
         <div id="autoFillHint" class="text-xs text-blue-700 font-medium">
-          💡 提示：只需輸入「上月累計」與「本月累計」，系統會自動相減算出「本月敷設」。若已有上月紀錄會自動帶入！
+          💡 提示：輸入「上月累計」與「本月累計」，系統自動相減算出「本月敷設」。
         </div>
       </div>
 
@@ -96,13 +96,13 @@
             </tr>
           </thead>
           <tbody>
-            <!-- 高壓 -->
-            <tr>
-              <td class="text-center font-bold">高壓管線</td>
+            <!-- 高壓 (特別凸顯) -->
+            <tr class="bg-blue-50/30">
+              <td class="text-center font-bold text-blue-900">⚡ 高壓管線</td>
               <td class="text-right">
                 <input type="number" step="0.01" id="pub_hp_prev" oninput="calculateAll()" placeholder="0.00" class="w-full text-right bg-amber-50/60 focus:bg-yellow-100 px-2 py-1 rounded outline-none font-mono" />
               </td>
-              <td class="text-right font-mono bg-slate-50/70" id="pub_hp_diff">0.00</td>
+              <td class="text-right font-mono font-bold text-blue-800 bg-blue-100/40" id="pub_hp_diff">0.00</td>
               <td class="text-right">
                 <input type="number" step="0.01" id="pub_hp_curr" oninput="calculateAll()" placeholder="0.00" class="w-full text-right bg-blue-50/60 focus:bg-blue-100 px-2 py-1 rounded outline-none font-mono font-semibold" />
               </td>
@@ -130,17 +130,17 @@
               </td>
             </tr>
             <!-- 合計 -->
-            <tr class="font-bold">
+            <tr class="font-bold bg-slate-100">
               <td class="text-center">合計</td>
-              <td class="text-right text-blue-700 font-mono" id="pub_tot_prev">0.00</td>
-              <td class="text-right text-blue-700 font-mono" id="pub_tot_diff">0.00</td>
-              <td class="text-right text-blue-700 font-mono" id="pub_tot_curr">0.00</td>
+              <td class="text-right font-mono" id="pub_tot_prev">0.00</td>
+              <td class="text-right font-mono" id="pub_tot_diff">0.00</td>
+              <td class="text-right font-mono" id="pub_tot_curr">0.00</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- 內部真實長度區塊 (列印時自動隱藏) -->
+      <!-- 內部真實長度區塊 -->
       <div class="no-print max-w-3xl mx-auto mt-8 pt-6 border-t-2 border-dashed border-slate-300">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
@@ -160,29 +160,33 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="border border-slate-300 p-2 text-center font-bold bg-slate-50">高壓管線</td>
+            <!-- 高壓 (內部) -->
+            <tr class="bg-rose-50/30">
+              <td class="border border-slate-300 p-2 text-center font-bold text-rose-950 bg-rose-100/50">⚡ 高壓管線</td>
               <td class="border border-slate-300 p-1"><input type="number" step="0.01" id="real_hp_prev" oninput="calculateAll()" placeholder="0.00" class="w-full text-right px-2 py-1 bg-amber-50/50 rounded font-mono outline-none" /></td>
-              <td class="border border-slate-300 p-2 text-right font-mono bg-slate-50" id="real_hp_diff">0.00</td>
+              <td class="border border-slate-300 p-2 text-right font-mono font-bold text-rose-800 bg-rose-100/40" id="real_hp_diff">0.00</td>
               <td class="border border-slate-300 p-1"><input type="number" step="0.01" id="real_hp_curr" oninput="calculateAll()" placeholder="0.00" class="w-full text-right px-2 py-1 bg-rose-50/50 rounded font-mono font-semibold outline-none" /></td>
             </tr>
+            <!-- 中壓 (內部) -->
             <tr>
               <td class="border border-slate-300 p-2 text-center font-bold bg-slate-50">中壓管線</td>
               <td class="border border-slate-300 p-1"><input type="number" step="0.01" id="real_mp_prev" oninput="calculateAll()" placeholder="0.00" class="w-full text-right px-2 py-1 bg-amber-50/50 rounded font-mono outline-none" /></td>
               <td class="border border-slate-300 p-2 text-right font-mono bg-slate-50" id="real_mp_diff">0.00</td>
               <td class="border border-slate-300 p-1"><input type="number" step="0.01" id="real_mp_curr" oninput="calculateAll()" placeholder="0.00" class="w-full text-right px-2 py-1 bg-rose-50/50 rounded font-mono font-semibold outline-none" /></td>
             </tr>
+            <!-- 低壓 (內部) -->
             <tr>
               <td class="border border-slate-300 p-2 text-center font-bold bg-slate-50">低壓管線</td>
               <td class="border border-slate-300 p-1"><input type="number" step="0.01" id="real_lp_prev" oninput="calculateAll()" placeholder="0.00" class="w-full text-right px-2 py-1 bg-amber-50/50 rounded font-mono outline-none" /></td>
               <td class="border border-slate-300 p-2 text-right font-mono bg-slate-50" id="real_lp_diff">0.00</td>
               <td class="border border-slate-300 p-1"><input type="number" step="0.01" id="real_lp_curr" oninput="calculateAll()" placeholder="0.00" class="w-full text-right px-2 py-1 bg-rose-50/50 rounded font-mono font-semibold outline-none" /></td>
             </tr>
-            <tr class="font-bold bg-rose-50/60">
+            <!-- 合計 (內部) -->
+            <tr class="font-bold bg-slate-100">
               <td class="border border-slate-300 p-2 text-center">真實合計</td>
-              <td class="border border-slate-300 p-2 text-right text-rose-700 font-mono" id="real_tot_prev">0.00</td>
-              <td class="border border-slate-300 p-2 text-right text-rose-700 font-mono" id="real_tot_diff">0.00</td>
-              <td class="border border-slate-300 p-2 text-right text-rose-700 font-mono" id="real_tot_curr">0.00</td>
+              <td class="border border-slate-300 p-2 text-right font-mono" id="real_tot_prev">0.00</td>
+              <td class="border border-slate-300 p-2 text-right font-mono" id="real_tot_diff">0.00</td>
+              <td class="border border-slate-300 p-2 text-right font-mono" id="real_tot_curr">0.00</td>
             </tr>
           </tbody>
         </table>
@@ -199,12 +203,12 @@
       </div>
     </div>
 
-    <!-- 年度趨勢與歷史資料庫 (非列印區) -->
+    <!-- 年度趨勢與歷史資料庫 -->
     <div class="no-print bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
       <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
         <div>
-          <h3 class="text-lg font-bold text-slate-800">📚 歷史紀錄檔案櫃與當年累計趨勢</h3>
-          <p class="text-xs text-slate-500 mt-1">所有紀錄皆永久保存於本機瀏覽器中，不會互相覆蓋。</p>
+          <h3 class="text-lg font-bold text-slate-800">📚 歷史紀錄檔案櫃與當年累計長度變化</h3>
+          <p class="text-xs text-slate-500 mt-1">完整記錄高、中、低壓與當年累計變化，絕不覆蓋。</p>
         </div>
         <div class="flex items-center gap-2">
           <label class="text-sm font-bold text-slate-700">篩選檢視年度：</label>
@@ -214,29 +218,29 @@
         </div>
       </div>
 
-      <!-- 當年 1~11 月 (或 1~12 月) 累計變化摘要卡片 -->
+      <!-- 當年累計長度變化總覽卡片 -->
       <div id="yearlySummaryBox" class="hidden bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
         <div class="flex items-center justify-between mb-3">
-          <h4 class="font-bold text-blue-900" id="yearlySummaryTitle">115 年 1月 ～ 11月 當年累計變化總覽</h4>
+          <h4 class="font-bold text-blue-900" id="yearlySummaryTitle">民國 115 年當年累計長度變化總覽</h4>
           <span class="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full" id="yearlyMonthRange">統計區間</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div class="bg-white p-3 rounded-lg border border-blue-100">
             <div class="font-bold text-slate-700 mb-2 border-b pb-1">📢 公開申報長度（當年淨增加量）</div>
             <div class="grid grid-cols-4 gap-2 text-center font-mono">
-              <div><span class="block text-xs text-slate-400">高壓</span><span id="sum_pub_hp" class="font-bold text-slate-800">0.00</span></div>
+              <div class="bg-blue-50/50 p-1 rounded"><span class="block text-xs text-blue-700 font-bold">高壓</span><span id="sum_pub_hp" class="font-bold text-blue-900">0.00</span></div>
               <div><span class="block text-xs text-slate-400">中壓</span><span id="sum_pub_mp" class="font-bold text-slate-800">0.00</span></div>
               <div><span class="block text-xs text-slate-400">低壓</span><span id="sum_pub_lp" class="font-bold text-slate-800">0.00</span></div>
-              <div><span class="block text-xs text-blue-600 font-bold">合計新增</span><span id="sum_pub_tot" class="font-bold text-blue-700">0.00</span></div>
+              <div><span class="block text-xs text-slate-600 font-bold">合計</span><span id="sum_pub_tot" class="font-bold text-slate-700">0.00</span></div>
             </div>
           </div>
           <div class="bg-white p-3 rounded-lg border border-rose-100">
             <div class="font-bold text-rose-900 mb-2 border-b pb-1">🔒 內部真實長度（當年淨增加量）</div>
             <div class="grid grid-cols-4 gap-2 text-center font-mono">
-              <div><span class="block text-xs text-slate-400">高壓</span><span id="sum_real_hp" class="font-bold text-slate-800">0.00</span></div>
+              <div class="bg-rose-50/50 p-1 rounded"><span class="block text-xs text-rose-700 font-bold">高壓</span><span id="sum_real_hp" class="font-bold text-rose-900">0.00</span></div>
               <div><span class="block text-xs text-slate-400">中壓</span><span id="sum_real_mp" class="font-bold text-slate-800">0.00</span></div>
               <div><span class="block text-xs text-slate-400">低壓</span><span id="sum_real_lp" class="font-bold text-slate-800">0.00</span></div>
-              <div><span class="block text-xs text-rose-600 font-bold">合計新增</span><span id="sum_real_tot" class="font-bold text-rose-700">0.00</span></div>
+              <div><span class="block text-xs text-slate-600 font-bold">合計</span><span id="sum_real_tot" class="font-bold text-slate-700">0.00</span></div>
             </div>
           </div>
         </div>
@@ -248,11 +252,10 @@
           <thead>
             <tr class="bg-slate-100 text-slate-700 border-b-2 border-slate-300">
               <th class="p-2.5">年月</th>
-              <th class="p-2.5 text-right">申報_高壓累計<br><span class="text-slate-400 font-normal">(本月敷設)</span></th>
-              <th class="p-2.5 text-right">申報_中壓累計<br><span class="text-slate-400 font-normal">(本月敷設)</span></th>
-              <th class="p-2.5 text-right">申報_低壓累計<br><span class="text-slate-400 font-normal">(本月敷設)</span></th>
-              <th class="p-2.5 text-right text-blue-700">申報_合計累計<br><span class="text-blue-500 font-normal">(本月敷設)</span></th>
-              <th class="p-2.5 text-right text-rose-700 bg-rose-50/50">真實_合計累計<br><span class="text-rose-500 font-normal">(本月敷設)</span></th>
+              <th class="p-2.5 text-right bg-blue-50/40 text-blue-900 font-bold">申報_高壓累計<br><span class="text-blue-600 font-normal">(本月敷設)</span></th>
+              <th class="p-2.5 text-right">申報_中壓累計</th>
+              <th class="p-2.5 text-right">申報_低壓累計</th>
+              <th class="p-2.5 text-right bg-rose-50/40 text-rose-900 font-bold">真實_高壓累計<br><span class="text-rose-600 font-normal">(本月敷設)</span></th>
               <th class="p-2.5 text-center">操作</th>
             </tr>
           </thead>
@@ -266,9 +269,8 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'hsin_hsiung_pipeline_records_v3';
+    const STORAGE_KEY = 'hsin_hsiung_pipeline_records_v4';
 
-    // 初始化範例資料（若完全無資料時，提供您圖片中的 115年05月 作為參考範例）
     function getRecords() {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) {
@@ -294,7 +296,6 @@
     }
 
     function saveRecordsToStorage(records) {
-      // 依年月排序
       records.sort((a, b) => (a.year - b.year) || (a.month - b.month));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
     }
@@ -307,9 +308,7 @@
       return parseFloat(document.getElementById(id).value) || 0;
     }
 
-    // 即時計算所有相減與加總
     function calculateAll() {
-      // 公開申報
       const p_hp_prev = val('pub_hp_prev'), p_hp_curr = val('pub_hp_curr');
       const p_mp_prev = val('pub_mp_prev'), p_mp_curr = val('pub_mp_curr');
       const p_lp_prev = val('pub_lp_prev'), p_lp_curr = val('pub_lp_curr');
@@ -326,7 +325,6 @@
       document.getElementById('pub_tot_diff').innerText = fmt(p_hp_diff + p_mp_diff + p_lp_diff);
       document.getElementById('pub_tot_curr').innerText = fmt(p_hp_curr + p_mp_curr + p_lp_curr);
 
-      // 內部真實
       const r_hp_prev = val('real_hp_prev'), r_hp_curr = val('real_hp_curr');
       const r_mp_prev = val('real_mp_prev'), r_mp_curr = val('real_mp_curr');
       const r_lp_prev = val('real_lp_prev'), r_lp_curr = val('real_lp_curr');
@@ -344,7 +342,6 @@
       document.getElementById('real_tot_curr').innerText = fmt(r_hp_curr + r_mp_curr + r_lp_curr);
     }
 
-    // 切換年月時，更新標題並自動尋找上個月的累計帶入
     function onDateChange() {
       const year = parseInt(document.getElementById('inputYear').value) || 115;
       const month = parseInt(document.getElementById('inputMonth').value) || 1;
@@ -359,11 +356,10 @@
 
       if (existing) {
         loadRecordToForm(existing, false);
-        document.getElementById('autoFillHint').innerText = `📌 已載入 ${year}年${monthStr}月 的歷史存檔供檢視或修改。`;
+        document.getElementById('autoFillHint').innerText = `📌 已載入 ${year}年${monthStr}月 存檔。`;
         return;
       }
 
-      // 尋找上一個月的紀錄自動帶入「上月累計」
       let prevYear = year;
       let prevMonth = month - 1;
       if (prevMonth === 0) {
@@ -388,14 +384,13 @@
         document.getElementById('real_mp_curr').value = '';
         document.getElementById('real_lp_curr').value = '';
 
-        document.getElementById('autoFillHint').innerText = `✨ 已自動帶入 ${prevYear}年${String(prevMonth).padStart(2, '0')}月 的本月累計作為「上月累計」！請直接輸入本月最新累計。`;
+        document.getElementById('autoFillHint').innerText = `✨ 已自動帶入 ${prevYear}年${String(prevMonth).padStart(2, '0')}月 的本月累計作為「上月累計」！`;
       } else {
-        document.getElementById('autoFillHint').innerText = `💡 尚無前一個月紀錄，請手動輸入「上月累計」與「本月累計」。`;
+        document.getElementById('autoFillHint').innerText = `💡 尚無前一個月紀錄，請手動輸入。`;
       }
       calculateAll();
     }
 
-    // 儲存紀錄（防呆防覆蓋）
     function saveRecord() {
       const year = parseInt(document.getElementById('inputYear').value);
       const month = parseInt(document.getElementById('inputMonth').value);
@@ -407,8 +402,7 @@
       const idx = records.findIndex(r => r.id === id);
 
       if (idx !== -1) {
-        const confirmOverwrite = confirm(`⚠️ 資料庫中已經有【${year} 年 ${monthStr} 月】的紀錄！\n\n為避免誤蓋資料，請確認：\n按「確定」將更新該月份數據；\n按「取消」保留原資料不變。`);
-        if (!confirmOverwrite) return;
+        if (!confirm(`⚠️ 【${year} 年 ${monthStr} 月】已有紀錄，確定要更新嗎？`)) return;
       }
 
       const newRecord = {
@@ -427,16 +421,13 @@
         }
       };
 
-      if (idx !== -1) {
-        records[idx] = newRecord;
-      } else {
-        records.push(newRecord);
-      }
+      if (idx !== -1) records[idx] = newRecord;
+      else records.push(newRecord);
 
       saveRecordsToStorage(records);
       updateYearFilterOptions(year);
       renderHistory();
-      alert(`✅ 已成功永久儲存【${year} 年 ${monthStr} 月】的申報與真實管線紀錄！`);
+      alert(`✅ 成功儲存【${year} 年 ${monthStr} 月】紀錄！`);
     }
 
     function loadRecordToForm(rec, scroll = true) {
@@ -464,7 +455,7 @@
     }
 
     function deleteRecord(id) {
-      if (!confirm(`確定要刪除【${id}】這筆紀錄嗎？刪除後無法復原（建議先匯出備份）。`)) return;
+      if (!confirm(`確定要刪除【${id}】這筆紀錄嗎？`)) return;
       let records = getRecords();
       records = records.filter(r => r.id !== id);
       saveRecordsToStorage(records);
@@ -489,18 +480,14 @@
       years.forEach(y => {
         const opt = document.createElement('option');
         opt.value = y;
-        opt.innerText = `民國 ${y} 年 (1~12月)`;
+        opt.innerText = `民國 ${y} 年`;
         select.appendChild(opt);
       });
 
-      if (years.includes(Number(currentVal))) {
-        select.value = currentVal;
-      } else if (years.length > 0 && !selectYear) {
-        select.value = years[0]; // 預設顯示最新年度
-      }
+      if (years.includes(Number(currentVal))) select.value = currentVal;
+      else if (years.length > 0 && !selectYear) select.value = years[0];
     }
 
-    // 渲染歷史清單與當年累計總覽
     function renderHistory() {
       const records = getRecords();
       const filterYear = document.getElementById('filterYear').value;
@@ -511,61 +498,52 @@
         ? records 
         : records.filter(r => r.year === Number(filterYear));
 
-      // 若選擇特定年度，計算該年度 1月~最新月（如1~11月）的當年累計變化
       const summaryBox = document.getElementById('yearlySummaryBox');
       if (filterYear !== 'ALL' && filtered.length > 0) {
         summaryBox.classList.remove('hidden');
         const first = filtered[0];
         const last = filtered[filtered.length - 1];
         document.getElementById('yearlySummaryTitle').innerText = `📅 民國 ${filterYear} 年（${first.month}月 ～ ${last.month}月）當年累計長度變化`;
-        document.getElementById('yearlyMonthRange').innerText = `共 ${filtered.length} 個月紀錄`;
+        document.getElementById('yearlyMonthRange').innerText = `共 ${filtered.length} 個月`;
 
-        // 當年淨增加 = 最後一筆的本月累計 - 第一筆的上月累計
-        const d_pub_hp = last.pub.hp_curr - first.pub.hp_prev;
-        const d_pub_mp = last.pub.mp_curr - first.pub.mp_prev;
-        const d_pub_lp = last.pub.lp_curr - first.pub.lp_prev;
+        // 申報當年淨增加
+        const d_p_hp = last.pub.hp_curr - first.pub.hp_prev;
+        const d_p_mp = last.pub.mp_curr - first.pub.mp_prev;
+        const d_p_lp = last.pub.lp_curr - first.pub.lp_prev;
+        document.getElementById('sum_pub_hp').innerText = (d_p_hp >= 0 ? '+' : '') + fmt(d_p_hp);
+        document.getElementById('sum_pub_mp').innerText = (d_p_mp >= 0 ? '+' : '') + fmt(d_p_mp);
+        document.getElementById('sum_pub_lp').innerText = (d_p_lp >= 0 ? '+' : '') + fmt(d_p_lp);
+        document.getElementById('sum_pub_tot').innerText = (d_p_hp + d_p_mp + d_p_lp >= 0 ? '+' : '') + fmt(d_p_hp + d_p_mp + d_p_lp);
 
-        document.getElementById('sum_pub_hp').innerText = (d_pub_hp >= 0 ? '+' : '') + fmt(d_pub_hp);
-        document.getElementById('sum_pub_mp').innerText = (d_pub_mp >= 0 ? '+' : '') + fmt(d_pub_mp);
-        document.getElementById('sum_pub_lp').innerText = (d_pub_lp >= 0 ? '+' : '') + fmt(d_pub_lp);
-        document.getElementById('sum_pub_tot').innerText = (d_pub_hp + d_pub_mp + d_pub_lp >= 0 ? '+' : '') + fmt(d_pub_hp + d_pub_mp + d_pub_lp);
-
-        const d_real_hp = last.real.hp_curr - first.real.hp_prev;
-        const d_real_mp = last.real.mp_curr - first.real.mp_prev;
-        const d_real_lp = last.real.lp_curr - first.real.lp_prev;
-
-        document.getElementById('sum_real_hp').innerText = (d_real_hp >= 0 ? '+' : '') + fmt(d_real_hp);
-        document.getElementById('sum_real_mp').innerText = (d_real_mp >= 0 ? '+' : '') + fmt(d_real_mp);
-        document.getElementById('sum_real_lp').innerText = (d_real_lp >= 0 ? '+' : '') + fmt(d_real_lp);
-        document.getElementById('sum_real_tot').innerText = (d_real_hp + d_real_mp + d_real_lp >= 0 ? '+' : '') + fmt(d_real_hp + d_real_mp + d_real_lp);
+        // 真實當年淨增加
+        const d_r_hp = last.real.hp_curr - first.real.hp_prev;
+        const d_r_mp = last.real.mp_curr - first.real.mp_prev;
+        const d_r_lp = last.real.lp_curr - first.real.lp_prev;
+        document.getElementById('sum_real_hp').innerText = (d_r_hp >= 0 ? '+' : '') + fmt(d_r_hp);
+        document.getElementById('sum_real_mp').innerText = (d_r_mp >= 0 ? '+' : '') + fmt(d_r_mp);
+        document.getElementById('sum_real_lp').innerText = (d_r_lp >= 0 ? '+' : '') + fmt(d_r_lp);
+        document.getElementById('sum_real_tot').innerText = (d_r_hp + d_r_mp + d_r_lp >= 0 ? '+' : '') + fmt(d_r_hp + d_r_mp + d_r_lp);
       } else {
         summaryBox.classList.add('hidden');
       }
 
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400">目前尚無紀錄，請在上方輸入後點擊儲存。</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400">目前尚無紀錄。</td></tr>';
         return;
       }
 
       filtered.forEach(rec => {
         const p_hp_d = rec.pub.hp_curr - rec.pub.hp_prev;
-        const p_mp_d = rec.pub.mp_curr - rec.pub.mp_prev;
-        const p_lp_d = rec.pub.lp_curr - rec.pub.lp_prev;
-        const p_tot_c = rec.pub.hp_curr + rec.pub.mp_curr + rec.pub.lp_curr;
-        const p_tot_d = p_hp_d + p_mp_d + p_lp_d;
-
-        const r_tot_c = rec.real.hp_curr + rec.real.mp_curr + rec.real.lp_curr;
-        const r_tot_d = (rec.real.hp_curr - rec.real.hp_prev) + (rec.real.mp_curr - rec.real.mp_prev) + (rec.real.lp_curr - rec.real.lp_prev);
+        const r_hp_d = rec.real.hp_curr - rec.real.hp_prev;
 
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50 transition';
         tr.innerHTML = `
           <td class="p-2.5 font-bold text-slate-800">${rec.year}年${String(rec.month).padStart(2, '0')}月</td>
-          <td class="p-2.5 text-right font-mono">${fmt(rec.pub.hp_curr)}<br><span class="text-xs text-slate-400">(${p_hp_d >= 0 ? '+' : ''}${fmt(p_hp_d)})</span></td>
-          <td class="p-2.5 text-right font-mono">${fmt(rec.pub.mp_curr)}<br><span class="text-xs text-slate-400">(${p_mp_d >= 0 ? '+' : ''}${fmt(p_mp_d)})</span></td>
-          <td class="p-2.5 text-right font-mono">${fmt(rec.pub.lp_curr)}<br><span class="text-xs text-slate-400">(${p_lp_d >= 0 ? '+' : ''}${fmt(p_lp_d)})</span></td>
-          <td class="p-2.5 text-right font-mono font-bold text-blue-700">${fmt(p_tot_c)}<br><span class="text-xs text-blue-500 font-normal">(${p_tot_d >= 0 ? '+' : ''}${fmt(p_tot_d)})</span></td>
-          <td class="p-2.5 text-right font-mono font-bold text-rose-700 bg-rose-50/40">${fmt(r_tot_c)}<br><span class="text-xs text-rose-500 font-normal">(${r_tot_d >= 0 ? '+' : ''}${fmt(r_tot_d)})</span></td>
+          <td class="p-2.5 text-right font-mono bg-blue-50/20 font-bold text-blue-900">${fmt(rec.pub.hp_curr)}<br><span class="text-xs text-blue-600 font-normal">(${p_hp_d >= 0 ? '+' : ''}${fmt(p_hp_d)})</span></td>
+          <td class="p-2.5 text-right font-mono">${fmt(rec.pub.mp_curr)}</td>
+          <td class="p-2.5 text-right font-mono">${fmt(rec.pub.lp_curr)}</td>
+          <td class="p-2.5 text-right font-mono bg-rose-50/20 font-bold text-rose-900">${fmt(rec.real.hp_curr)}<br><span class="text-xs text-rose-600 font-normal">(${r_hp_d >= 0 ? '+' : ''}${fmt(r_hp_d)})</span></td>
           <td class="p-2.5 text-center space-x-1">
             <button onclick='loadRecordToForm(${JSON.stringify(rec)})' class="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded text-xs font-medium">載入/編輯</button>
             <button onclick="deleteRecord('${rec.id}')" class="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-xs font-medium">刪除</button>
@@ -575,52 +553,21 @@
       });
     }
 
-    // 匯出完全對應您 Google 試算表欄位的 CSV
     function exportCSV() {
       const records = getRecords();
-      if (records.length === 0) return alert('目前沒有資料可匯出！');
-
-      const headers = [
-        '年', '月',
-        '申報_高壓_上月累計', '申報_高壓_本月敷設', '申報_高壓_本月累計',
-        '申報_中壓_上月累計', '申報_中壓_本月敷設', '申報_中壓_本月累計',
-        '申報_低壓_上月累計', '申報_低壓_本月敷設', '申報_低壓_本月累計',
-        '申報_合計_本月累計',
-        '真實_高壓_上月累計', '真實_高壓_本月敷設', '真實_高壓_本月累計',
-        '真實_中壓_上月累計', '真實_中壓_本月敷設', '真實_中壓_本月累計',
-        '真實_低壓_上月累計', '真實_低壓_本月敷設', '真實_低壓_本月累計',
-        '真實_合計_本月累計'
-      ];
-
-      const rows = records.map(r => {
-        const p_hp_d = (r.pub.hp_curr - r.pub.hp_prev).toFixed(2);
-        const p_mp_d = (r.pub.mp_curr - r.pub.mp_prev).toFixed(2);
-        const p_lp_d = (r.pub.lp_curr - r.pub.lp_prev).toFixed(2);
-        const p_tot = (r.pub.hp_curr + r.pub.mp_curr + r.pub.lp_curr).toFixed(2);
-
-        const r_hp_d = (r.real.hp_curr - r.real.hp_prev).toFixed(2);
-        const r_mp_d = (r.real.mp_curr - r.real.mp_prev).toFixed(2);
-        const r_lp_d = (r.real.lp_curr - r.real.lp_prev).toFixed(2);
-        const r_tot = (r.real.hp_curr + r.real.mp_curr + r.real.lp_curr).toFixed(2);
-
-        return [
-          r.year, r.month,
-          r.pub.hp_prev, p_hp_d, r.pub.hp_curr,
-          r.pub.mp_prev, p_mp_d, r.pub.mp_curr,
-          r.pub.lp_prev, p_lp_d, r.pub.lp_curr,
-          p_tot,
-          r.real.hp_prev, r_hp_d, r.real.hp_curr,
-          r.real.mp_prev, r_mp_d, r.real.mp_curr,
-          r.real.lp_prev, r_lp_d, r.real.lp_curr,
-          r_tot
-        ].join(',');
-      });
+      if (records.length === 0) return alert('無資料可匯出！');
+      const headers = ['年','月','申報_高壓上月','申報_高壓本月敷設','申報_高壓本月累計','真實_高壓上月','真實_高壓本月敷設','真實_高壓本月累計'];
+      const rows = records.map(r => [
+        r.year, r.month,
+        r.pub.hp_prev, (r.pub.hp_curr - r.pub.hp_prev).toFixed(2), r.pub.hp_curr,
+        r.real.hp_prev, (r.real.hp_curr - r.real.hp_prev).toFixed(2), r.real.hp_curr
+      ].join(','));
 
       const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `欣雄天然氣_管線敷設雙軌統計_${new Date().toISOString().slice(0,10)}.csv`;
+      link.download = `欣雄天然氣_高壓管線統計_${new Date().toISOString().slice(0,10)}.csv`;
       link.click();
     }
 
@@ -629,7 +576,7 @@
       const blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `欣雄管線資料庫備份_${new Date().toISOString().slice(0,10)}.json`;
+      link.download = `欣雄管線備份_${new Date().toISOString().slice(0,10)}.json`;
       link.click();
     }
 
@@ -640,24 +587,21 @@
       reader.onload = function(e) {
         try {
           const imported = JSON.parse(e.target.result);
-          if (!Array.isArray(imported)) throw new Error('格式錯誤');
           const existing = getRecords();
-          // 合併且不直接覆蓋，以匯入資料更新或新增
           const map = new Map(existing.map(item => [item.id, item]));
           imported.forEach(item => map.set(item.id, item));
           saveRecordsToStorage(Array.from(map.values()));
           updateYearFilterOptions();
           renderHistory();
           onDateChange();
-          alert('✅ 備份資料已成功合併匯入！');
+          alert('✅ 匯入成功！');
         } catch (err) {
-          alert('❌ 匯入失敗，請確認檔案為正確的 JSON 備份檔。');
+          alert('❌ 檔案格式錯誤');
         }
       };
       reader.readAsText(file);
     }
 
-    // 啟動初始化
     window.onload = function() {
       updateYearFilterOptions();
       renderHistory();
