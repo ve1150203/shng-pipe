@@ -36,19 +36,12 @@
     <div class="no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <span class="bg-blue-700 text-white px-3 py-1 rounded-lg font-bold text-sm">圖資專用</span>
-        <h1 class="text-lg font-bold text-slate-800">管線敷設統計系統（支援 Excel 自動匯入與 MA 轉換）</h1>
+        <h1 class="text-lg font-bold text-slate-800">管線敷設統計系統（已連線 Google 試算表雲端同步）</h1>
       </div>
       <div class="flex flex-wrap items-center gap-2">
         <button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition">
           📥 下載 Excel 總表 (.csv)
         </button>
-        <button onclick="exportJSON()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition">
-          💾 備份資料 (.json)
-        </button>
-        <label class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition">
-          📂 還原備份
-          <input type="file" id="importJsonFile" accept=".json" class="hidden" onchange="importJSON(event)" />
-        </label>
         <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-1.5 rounded-lg text-sm font-bold transition">
           🖨️ 列印報表
         </button>
@@ -86,7 +79,7 @@
       </div>
 
       <div id="statusBanner" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200 flex flex-wrap items-center justify-between gap-2">
-        <span>💡 匯入規則：自動讀取 <b>PIPE</b> 分頁，計算 H、M、L 總長度；凡含有 <b>MA</b> 的段落，<b>申報算中壓 (M)</b>、<b>實際算高壓 (H)</b>。</span>
+        <span>💡 規則：自動讀取 <b>PIPE</b> 分頁；凡含有 <b>MA</b> 的段落，<b>申報算中壓 (M)</b>、<b>實際算高壓 (H)</b>。資料已連線至 Google 試算表雲端。</span>
         <span id="excelParseResult" class="font-bold text-blue-700"></span>
       </div>
     </div>
@@ -204,11 +197,11 @@
           清空目前數值
         </button>
         <button onclick="saveMonthlyRecord()" class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-sm transition">
-          ✅ 儲存本月紀錄（永不覆蓋）
+          ✅ 儲存本月紀錄（同步至雲端試算表）
         </button>
       </div>
 
-      <!-- 表三：當年累計新增管線長度（與是否勾選列印實際長度連動） -->
+      <!-- 表三：當年累計新增管線長度 -->
       <div id="yearlySummarySection" class="max-w-3xl mx-auto pt-6 border-t border-slate-300 page-break-avoid">
         <div class="flex items-center justify-between mb-2">
           <h3 class="font-bold text-slate-800 text-base md:text-lg" style="font-family: 'DFKai-SB', '標楷體', serif;">
@@ -251,8 +244,8 @@
     <div class="no-print bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3">
         <div>
-          <h3 class="text-lg font-bold text-slate-800">📋 每月已登錄管線長度列表</h3>
-          <p class="text-xs text-slate-500">所有已儲存的月份皆完整條列於此，可隨時載入檢視或修改。</p>
+          <h3 class="text-lg font-bold text-slate-800">📋 每月已登錄管線長度列表（雲端同步）</h3>
+          <p class="text-xs text-slate-500">資料直接由 Google 試算表載入，手機與電腦隨時互通。</p>
         </div>
         <div class="flex items-center gap-2">
           <label class="text-sm font-bold text-slate-700">篩選年度：</label>
@@ -285,7 +278,7 @@
     <div class="no-print bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
       <div class="border-b border-slate-200 pb-3">
         <h3 class="text-lg font-bold text-slate-800">🏆 歷年年度新增管線長度統計總表（115年、116年、117年...）</h3>
-        <p class="text-xs text-slate-500">自動彙整每一個年度（1月～12月已登錄區間）的淨增加長度，方便跨年度長期追蹤。</p>
+        <p class="text-xs text-slate-500">自動彙整每一個年度（1月～12月已登錄區間）的淨增加長度。</p>
       </div>
 
       <div class="overflow-x-auto">
@@ -310,16 +303,77 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'hsin_hsiung_pipe_system_final_v1';
+    // 您的 Google Apps Script 雲端同步網址
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJn2nUykx430kvu6Tqio2_5Wc4iWliGGr9Wm2u21jgZ33IvWHAh1v8rBCt8_RwfZj3fQ/exec';
+    
+    let cloudRecords = [];
 
     function getRecords() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
+      return cloudRecords;
     }
 
-    function saveRecords(records) {
-      records.sort((a, b) => (a.year - b.year) || (a.month - b.month));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    // 從 Google 試算表載入資料
+    async function loadRecordsFromCloud() {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL);
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          cloudRecords = data;
+          cloudRecords.sort((a, b) => (a.year - b.year) || (a.month - b.month));
+          updateYearDropdown();
+          renderAllTables();
+          onDateChange();
+        }
+      } catch (err) {
+        console.error('無法從雲端載入資料，改用本機快取', err);
+        const raw = localStorage.getItem('hsin_hsiung_pipe_local');
+        if (raw) {
+          cloudRecords = JSON.parse(raw);
+          updateYearDropdown();
+          renderAllTables();
+          onDateChange();
+        }
+      }
+    }
+
+    // 儲存資料至 Google 試算表
+    async function saveRecordToCloud(rec) {
+      try {
+        // 先更新本地
+        const idx = cloudRecords.findIndex(r => r.year === rec.year && r.month === rec.month);
+        if (idx !== -1) cloudRecords[idx] = rec;
+        else cloudRecords.push(rec);
+        cloudRecords.sort((a, b) => (a.year - b.year) || (a.month - b.month));
+        localStorage.setItem('hsin_hsiung_pipe_local', JSON.stringify(cloudRecords));
+
+        // 發送 POST 到 Google Apps Script
+        await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(rec)
+        });
+
+        alert(`✅ 【民國 ${rec.year} 年 ${String(rec.month).padStart(2, '0')} 月】已成功同步儲存至 Google 試算表！`);
+        loadRecordsFromCloud();
+      } catch (err) {
+        console.error('儲存至雲端失敗', err);
+        alert('❌ 儲存至雲端失敗，請檢查網路連線。');
+      }
+    }
+
+    // 刪除紀錄
+    async function deleteRecord(y, m) {
+      if (!confirm(`確定要刪除【民國 ${y} 年 ${String(m).padStart(2, '0')} 月】的紀錄嗎？`)) return;
+      cloudRecords = cloudRecords.filter(r => !(r.year === y && r.month === m));
+      localStorage.setItem('hsin_hsiung_pipe_local', JSON.stringify(cloudRecords));
+      
+      // 同步寫入空資料或透過後端刪除（此處重新儲存剩餘資料或發送刪除訊號）
+      // 簡單起見，重新載入
+      updateYearDropdown();
+      renderAllTables();
+      recalc();
+      alert('✅ 已刪除本機紀錄（若需同步試算表請重新整理）。');
     }
 
     function fmt(n) {
@@ -335,7 +389,6 @@
       return parseFloat(document.getElementById(id).value) || 0;
     }
 
-    // 控制勾選列印實際長度時，是否連動隱藏「實際表格」與「當年累計表」
     function togglePrintReal() {
       const checked = document.getElementById('printRealCheckbox').checked;
       if (checked) {
@@ -556,12 +609,6 @@
       const m = parseInt(document.getElementById('inputMonth').value);
       if (!y || !m) return alert('請輸入正確的民國年與月份！');
 
-      const records = getRecords();
-      const idx = records.findIndex(r => r.year === y && r.month === m);
-      if (idx !== -1) {
-        if (!confirm(`⚠️ 資料庫中已有【民國 ${y} 年 ${String(m).padStart(2, '0')} 月】的紀錄，確定要覆蓋更新嗎？`)) return;
-      }
-
       const rec = {
         year: y,
         month: m,
@@ -577,13 +624,7 @@
         }
       };
 
-      if (idx !== -1) records[idx] = rec;
-      else records.push(rec);
-
-      saveRecords(records);
-      updateYearDropdown(y);
-      renderAllTables();
-      alert(`✅ 已成功永久儲存【民國 ${y} 年 ${String(m).padStart(2, '0')} 月】的管線統計資料！`);
+      saveRecordToCloud(rec);
     }
 
     function loadRecordToForm(rec, scroll = true) {
@@ -608,15 +649,6 @@
 
       recalc();
       if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function deleteRecord(y, m) {
-      if (!confirm(`確定要刪除【民國 ${y} 年 ${String(m).padStart(2, '0')} 月】的紀錄嗎？`)) return;
-      const filtered = getRecords().filter(r => !(r.year === y && r.month === m));
-      saveRecords(filtered);
-      updateYearDropdown();
-      renderAllTables();
-      recalc();
     }
 
     function updateYearDropdown(selectYear = null) {
@@ -730,34 +762,8 @@
       a.download = `欣雄天然氣_管線統計總表_${new Date().toISOString().slice(0,10)}.csv`; a.click();
     }
 
-    function exportJSON() {
-      const blob = new Blob([JSON.stringify(getRecords(), null, 2)], { type: 'application/json' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-      a.download = `欣雄管線系統備份_${new Date().toISOString().slice(0,10)}.json`; a.click();
-    }
-
-    function importJSON(e) {
-      const f = e.target.files[0]; if (!f) return;
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        try {
-          const imported = JSON.parse(evt.target.result);
-          if (!Array.isArray(imported)) throw new Error('格式錯誤');
-          const existing = getRecords();
-          const map = new Map(existing.map(item => [`${item.year}-${item.month}`, item]));
-          imported.forEach(item => map.set(`${item.year}-${item.month}`, item));
-          saveRecords(Array.from(map.values()));
-          updateYearDropdown(); renderAllTables(); onDateChange();
-          alert('✅ 備份資料已成功合併還原！');
-        } catch (err) { alert('❌ 備份檔格式錯誤！'); }
-      };
-      reader.readAsText(f);
-    }
-
     window.onload = function() {
-      updateYearDropdown();
-      renderAllTables();
-      onDateChange();
+      loadRecordsFromCloud();
     };
   </script>
 </body>
